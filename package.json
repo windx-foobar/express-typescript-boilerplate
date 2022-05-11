@@ -2,18 +2,21 @@
   "name": "express-typescript-boilerplate",
   "version": "3.2.0",
   "description": "A delightful way to building a Node.js RESTful API Services with beautiful code written in TypeScript",
-  "main": "src/app.ts",
+  "main": "public/index.ts",
   "scripts": {
     "start": "nps",
+    "start:dev": "npm start serve",
+    "start:dev:inspector": "npm start server.inspector",
     "test": "npm start test",
     "build": "npm start build",
     "presetup": "yarn install",
-    "setup": "npm start config && npm start setup.script"
+    "setup": "npm start config && npm start setup.script",
+    "execute": "node -r ts-node/register -r module-alias/register"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">= 14"
   },
-  "repository": "git+ssh://git@github.com/w3tec/express-typescript-boilerplate.git",
+  "repository": "git+ssh://git@github.com/windx-foobar/express-typescript-boilerplate.git",
   "keywords": [
     "NodeJS",
     "TypeScript",
@@ -24,7 +27,7 @@
     "w3tec.ch"
   ],
   "homepage": "https://github.com/w3tec/express-typescript-boilerplate#readme",
-  "author": "w3tec.ch <info@w3tec.ch>",
+  "author": "windx-foobar <bezalkogoln1ycoder@gmail.com>",
   "contributors": [
     {
       "name": "David Weber",
@@ -35,10 +38,15 @@
       "name": "Gery Hirschfeld",
       "email": "gery.hirschfeld@w3tec.ch",
       "url": "https://github.com/hirsch88"
+    },
+    {
+      "name": "Windx Foobar",
+      "email": "bezalkogoln1ycoder@gmail.com",
+      "url": "https://github.com/windx-foobar"
     }
   ],
   "dependencies": {
-    "bcrypt": "3.0.1",
+    "bcrypt": "^5.0.1",
     "chalk": "^2.4.1",
     "class-validator": "^0.9.1",
     "commander": "^2.19.0",
@@ -50,33 +58,30 @@
     "event-dispatch": "^0.4.1",
     "express": "^4.16.2",
     "express-basic-auth": "^1.1.3",
-    "express-graphql": "^0.6.11",
     "express-status-monitor": "^1.0.1",
-    "faker": "^4.1.0",
     "figlet": "^1.2.0",
     "glob": "^7.1.2",
-    "graphql": "14.0.2",
     "helmet": "^3.9.0",
     "jsonfile": "5.0.0",
     "microframework-w3tec": "^0.6.3",
+    "module-alias": "^2.2.2",
     "morgan": "^1.9.0",
     "nodemon": "^1.12.1",
     "nps": "^5.7.1",
     "nps-utils": "^1.5.0",
-    "pg": "^7.4.3",
+    "pg": "^8.7.3",
+    "pg-hstore": "^2.3.4",
     "reflect-metadata": "^0.1.10",
     "routing-controllers": "^0.7.6",
+    "sequelize": "^6.19.0",
+    "sequelize-cli": "^6.4.1",
+    "sequelize-typescript": "^2.1.3",
     "serve-favicon": "^2.4.5",
     "supertest": "^3.0.0",
-    "swagger-ui-express": "4.0.1",
     "ts-node": "7.0.1",
     "tslint": "^5.8.0",
-    "type-graphql": "^0.15.0",
     "typedi": "0.8.0",
-    "typeorm": "^0.2.5",
-    "typeorm-seeding": "^1.0.0-beta.6",
-    "typeorm-typedi-extensions": "^0.2.1",
-    "typescript": "3.0.3",
+    "typescript": "^4.6.4",
     "uuid": "^3.3.2",
     "winston": "3.1.0"
   },
@@ -96,6 +101,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@faker-js/faker": "^6.3.1",
     "@types/bcrypt": "^2.0.0",
     "@types/bluebird": "^3.5.18",
     "@types/chalk": "^2.2.0",
@@ -103,8 +109,8 @@
     "@types/cors": "^2.8.1",
     "@types/dotenv": "^4.0.2",
     "@types/express": "^4.0.39",
-    "@types/faker": "^4.1.2",
     "@types/figlet": "^1.2.0",
+    "@types/glob": "^7.2.0",
     "@types/helmet": "0.0.41",
     "@types/jest": "23.3.2",
     "@types/morgan": "^1.7.35",
@@ -120,7 +126,22 @@
     "mock-express-response": "^0.2.1",
     "ncp": "^2.0.0",
     "nock": "10.0.0",
-    "sqlite3": "^4.0.0",
+    "sqlite3": "^5.0.7",
     "ts-jest": "23.10.1"
+  },
+  "commentDependencies": {
+    "typeorm": "^0.2.5",
+    "typeorm-seeding": "^1.0.0-beta.6",
+    "typeorm-typedi-extensions": "^0.2.1",
+    "graphql": "14.0.2",
+    "type-graphql": "^0.15.0",
+    "express-graphql": "^0.6.11",
+    "swagger-ui-express": "4.0.1"
+  },
+  "commentDevDependencies": {},
+  "_moduleAliases": {
+    "@": "./",
+    "@packages": "./packages",
+    "@app": "./app"
   }
 }
