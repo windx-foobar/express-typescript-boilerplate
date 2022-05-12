@@ -20,7 +20,7 @@ export class Pet extends Model {
   public payload: object;
 
   @ForeignKey(() => User)
-  public userId: User | null;
+  public userId: number | null;
 
   @BelongsTo(() => User)
   public user: User | null;
