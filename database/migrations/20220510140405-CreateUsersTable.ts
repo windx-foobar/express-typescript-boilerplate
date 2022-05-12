@@ -11,8 +11,8 @@ export default {
         "password" VARCHAR(255) DEFAULT NULL,
         "payload" JSONB NOT NULL DEFAULT '{}',
 
-        "created_at" timestamp NOT NULL,
-        "updated_at" timestamp NOT NULL,
+        "created_at" TIMESTAMP WITH TIME ZONE NOT NULL,
+        "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL,
         "deleted_at" TIMESTAMP WITH TIME ZONE,
 
         PRIMARY KEY ("id")
