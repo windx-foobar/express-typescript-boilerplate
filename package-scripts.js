@@ -283,12 +283,7 @@ module.exports = {
       migration: {
         script: series(
           'nps banner.makeMigration',
-          runFast([
-            './node_modules/sequelize-cli/lib/sequelize',
-            'migration:generate',
-            '--migrations-path database/migrations',
-            `--name ${process.argv.slice(-1)}`
-          ].join(' '))
+          runFast(`./packages/core/commands/make.migration.ts`)
         ),
         // TODO: Перевести на инглиш
         description: 'Генерация файла миграции'
@@ -296,12 +291,7 @@ module.exports = {
       seed: {
         script: series(
           'nps banner.makeSeed',
-          runFast([
-            './node_modules/sequelize-cli/lib/sequelize',
-            'seed:generate',
-            '--seeders-path database/seeds',
-            `--name ${process.argv.slice(-1)}`
-          ].join(' '))
+          runFast(`./packages/core/commands/make.seed.ts`)
         ),
         // TODO: Перевести на инглиш
         description: 'Генерация файла сидера'
