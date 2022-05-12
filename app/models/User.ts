@@ -4,9 +4,11 @@ import {
   DataType,
   BeforeCreate,
   BeforeUpdate,
-  DefaultScope
+  DefaultScope,
+  HasMany
 } from 'sequelize-typescript';
 import { Model } from '@packages/advanced-sequelize';
+import { Pet } from '@app/models/Pet';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import * as bcrypt from 'bcrypt';
 
@@ -58,6 +60,9 @@ export class User extends Model {
 
   @Column({ type: DataType.JSONB, defaultValue: {} })
   public payload: object;
+
+  @HasMany(() => Pet)
+  public pets: Pet[];
 
   public async hashPassword() {
     if (!this.changed('password')) return;
