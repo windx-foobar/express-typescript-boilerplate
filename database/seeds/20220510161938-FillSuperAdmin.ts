@@ -1,5 +1,4 @@
 import { QueryInterface, fn } from 'sequelize';
-// import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
 
 module.exports = {
@@ -14,21 +13,6 @@ module.exports = {
      * }], {});
      */
 
-    /*const records = await Promise.all(
-     Array(10).fill('')
-     .map(async (): Promise<any> => {
-     const password = await bcrypt.hash('secret', 10);
-
-     return {
-     email: faker.unique(faker.internet.email),
-     password,
-     createdAt: faker.date.betweens(
-     '2022-02-01T00:00:00.000Z',
-     new Date()
-     )
-     };
-     })
-     );*/
     const password = await bcrypt.hash('123456', 10);
 
     await queryInterface.insert(undefined, 'users', {
