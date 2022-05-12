@@ -1,0 +1,17 @@
+import { QueryInterface } from 'sequelize';
+
+module.exports = {
+  async up(queryInterface: QueryInterface) {
+    /**
+     * Put seed code here
+     * @see https://sequelize.org/docs/v6/other-topics/migrations/#creating-the-first-seed
+     */
+  },
+
+  async down(queryInterface: QueryInterface) {
+    /**
+     * Put revert seed code here
+     * @see https://sequelize.org/docs/v6/other-topics/migrations/#creating-the-first-seed
+     */
+  }
+};

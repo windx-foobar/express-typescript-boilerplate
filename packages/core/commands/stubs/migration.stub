@@ -1,0 +1,17 @@
+import { QueryInterface } from 'sequelize';
+
+export default {
+  async up({ sequelize }: QueryInterface) {
+    /**
+     * Put migration code here
+     * @see https://sequelize.org/docs/v6/other-topics/migrations/#migration-skeleton
+     */
+  },
+
+  async down({ sequelize }: QueryInterface) {
+    /**
+     * Put migration rollback code here
+     * @see https://sequelize.org/docs/v6/other-topics/migrations/#migration-skeleton
+     */
+  }
+};
