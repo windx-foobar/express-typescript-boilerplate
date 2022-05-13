@@ -1,11 +1,14 @@
-import { MicroframeworkLoader, MicroframeworkSettings } from 'microframework-w3tec';
+import { MicroframeworkSettings, MicroframeworkLoader } from 'microframework-w3tec';
 import { SequelizeOptions, Sequelize } from 'sequelize-typescript';
 import { Container } from 'typedi';
-import { config } from '../config';
+import { config } from '@packages/core/config';
+import { Logger } from '@packages/core/lib/logger';
 
 export const sequelizeLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ): Promise<void> => {
+  const logger = new Logger('sequelize');
+
   const connectionOptions: SequelizeOptions = {
     dialect: config.db.type as any,
     host: config.db.host,
@@ -18,7 +21,7 @@ export const sequelizeLoader: MicroframeworkLoader = async (
       max: 5,
       idle: 10000
     },
-    logging: config.isProduction ? false : console.log,
+    logging: config.isProduction ? false : (message: any) => logger.info(message),
     models: [config.app.dirs.entitiesDir]
   };
 
