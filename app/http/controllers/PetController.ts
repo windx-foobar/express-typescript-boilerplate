@@ -11,20 +11,17 @@ import {
 import { User } from '@app/models/User';
 import { Pet } from '@app/models/Pet';
 import { Sequelize, SequelizeInterface } from '@packages/advanced-sequelize';
-import { BaseJsonController } from '@packages/core/controllers';
 import { NotFoundError, BadRequestError } from '@packages/core/errors';
 import { Maybe } from '@packages/core/utils';
 
 // import { Logger, LoggerInterface } from '@packages/core/decorators/Logger';
 
 @JsonController('/pets')
-export class PetController extends BaseJsonController {
+export class PetController {
   constructor(
     // @Logger(__filename) private logger: LoggerInterface,
     @Sequelize() private sequelize: SequelizeInterface
-  ) {
-    super();
-  }
+  ) {}
 
   @Get()
   public async index() {
@@ -41,7 +38,7 @@ export class PetController extends BaseJsonController {
       return petRows.map((row) => row.toJSON());
     } catch (error) {
       if (transaction) await transaction.rollback();
-      return this.handleError(error);
+      throw error;
     }
   }
 
@@ -62,7 +59,7 @@ export class PetController extends BaseJsonController {
       return petRow.toJSON();
     } catch (error) {
       if (transaction) await transaction.rollback();
-      return this.handleError(error);
+      throw error;
     }
   }
 
@@ -81,7 +78,7 @@ export class PetController extends BaseJsonController {
       return petRow.toJSON();
     } catch (error) {
       if (transaction) await transaction.rollback();
-      return this.handleError(error);
+      throw error;
     }
   }
 
@@ -104,7 +101,7 @@ export class PetController extends BaseJsonController {
       return petRow.toJSON();
     } catch (error) {
       if (transaction) await transaction.rollback();
-      return this.handleError(error);
+      throw error;
     }
   }
 
@@ -124,7 +121,7 @@ export class PetController extends BaseJsonController {
       return { id: petRow.id };
     } catch (error) {
       if (transaction) await transaction.rollback();
-      return this.handleError(error);
+      throw error;
     }
   }
 
@@ -156,7 +153,7 @@ export class PetController extends BaseJsonController {
       return petRow.toJSON();
     } catch (error) {
       if (transaction) await transaction.rollback();
-      return this.handleError(error);
+      throw error;
     }
   }
 }
