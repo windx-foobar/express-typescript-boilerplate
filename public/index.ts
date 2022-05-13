@@ -1,15 +1,26 @@
 import 'reflect-metadata';
 
+import moduleAlias from 'module-alias';
 import { bootstrapMicroframework } from 'microframework-w3tec';
+
+import { replacePathToProduction } from '../packages/core/lib/env';
+
+moduleAlias.addAliases({
+  '@': replacePathToProduction('./'),
+  '@packages': replacePathToProduction('packages'),
+  '@app': replacePathToProduction('app')
+});
 
 import { banner } from '@packages/core/lib/banner';
 import { Logger } from '@packages/core/lib/logger';
-import { expressLoader } from '@packages/core/loaders/expressLoader';
-import { iocLoader } from '@packages/core/loaders/iocLoader';
-import { publicLoader } from '@packages/core/loaders/publicLoader';
-import { winstonLoader } from '@packages/core/loaders/winstonLoader';
-import { sequelizeLoader } from '@packages/core/loaders/sequelizeLoader';
-import { homeLoader } from '@packages/core/loaders/homeLoader';
+import {
+  expressLoader,
+  iocLoader,
+  publicLoader,
+  sequelizeLoader,
+  winstonLoader,
+  homeLoader
+} from '@packages/core/loaders';
 // import { eventDispatchLoader } from '@packages/core/loaders/eventDispatchLoader';
 // import { graphqlLoader } from './loaders/graphqlLoader';
 // import { monitorLoader } from './loaders/monitorLoader';
@@ -44,4 +55,4 @@ bootstrapMicroframework({
   ]
 })
   .then(() => banner(log))
-  .catch((error: Error) => log.error('Application is crashed: ' + error));
+  .catch((error: Error) => log.error(error.message));
