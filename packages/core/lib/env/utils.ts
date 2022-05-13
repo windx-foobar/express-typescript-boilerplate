@@ -12,12 +12,24 @@ export function getOsEnvOptional(key: string): string | undefined {
   return process.env[key];
 }
 
+export function replacePathToProduction(path: string): string {
+  if (process.env.NODE_ENV === 'production') {
+    path = path.replace(
+      /(app|global|packages|public|database|\.\/)(.*)/,
+      'dist/$1$2'
+    );
+  }
+
+  return join(process.cwd(), path);
+}
+
 export function getPath(path: string): string {
-  return (
-    process.env.NODE_ENV === 'production'
-  )
-    ? join(process.cwd(), path.replace('src/', 'dist/').slice(0, -3) + '.js')
-    : join(process.cwd(), path);
+  const smartPath = replacePathToProduction(path);
+  const isTsFile = /\.ts$/.test(smartPath);
+
+  return process.env.NODE_ENV === 'production' && isTsFile
+    ? smartPath.slice(0, -3) + '.js'
+    : smartPath;
 }
 
 export function getPaths(paths: string[]): string[] {
