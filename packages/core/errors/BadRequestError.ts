@@ -11,7 +11,7 @@ export class BadRequestError extends HttpError {
       for (const errorItem of error.errors) {
         if (errorItem.path) {
           const name = errorItem.path.split('.').slice(0, 1).join('');
-          transformed[name] = errorItem.message;
+          transformed[name] = [errorItem.message];
         }
       }
 
