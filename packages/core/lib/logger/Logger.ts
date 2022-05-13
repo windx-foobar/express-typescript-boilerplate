@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as winston from 'winston';
-import { env } from '../../env';
+import { config } from '../../config';
 
 /**
  * core.Log
@@ -30,7 +30,7 @@ export class Logger {
     return filepath;
   }
 
-  private scope: string;
+  private readonly scope: string;
 
   constructor(scope?: string) {
     this.scope = Logger.parsePathToScope((
@@ -60,7 +60,7 @@ export class Logger {
   }
 
   private log(level: string, message: string, args: any[]): void {
-    if (level === 'debug' && !env.isProduction) {
+    if (level === 'debug' && !config?.isProduction) {
       console.log(message, ...args);
     } else {
       if (winston) {
