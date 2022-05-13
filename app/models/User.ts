@@ -64,13 +64,21 @@ export class User extends Model {
   @HasMany(() => Pet)
   public pets: Pet[];
 
-  public async hashPassword() {
+  public async hashPassword(): Promise<void> {
     if (!this.changed('password')) return;
     try {
       const { password } = this;
       const salt = await bcrypt.genSalt();
 
       this.password = await bcrypt.hash(password, salt);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async comparePassword(password: string): Promise<boolean> {
+    try {
+      return await bcrypt.compare(password, this.password);
     } catch (error) {
       throw error;
     }
