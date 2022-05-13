@@ -1,46 +1,44 @@
-import { validate } from 'class-validator';
-
-import { User } from '../../../src/api/models/User';
+import { User } from '@/app/models/User';
+import { createDatabaseConnection, closeDatabase } from '../../utils/database';
 
 describe('UserValidations', () => {
+  let connection;
 
-    test('User should always have a first name', async (done) => {
-        const user = new User();
-        const errorsOne = await validate(user);
-        user.firstName = 'TestName';
-        const errorsTwo = await validate(user);
-        expect(errorsOne.length).toBeGreaterThan(errorsTwo.length);
-        done();
-    });
+  beforeAll(async () => {
+    connection = await createDatabaseConnection();
+  });
 
-    test('User should always have a last name', async (done) => {
-        const user = new User();
-        const errorsOne = await validate(user);
-        user.lastName = 'TestName';
-        const errorsTwo = await validate(user);
-        expect(errorsOne.length).toBeGreaterThan(errorsTwo.length);
-        done();
-    });
+  afterAll(async () => {
+    await closeDatabase(connection);
+  });
 
-    test('User should always have a email', async (done) => {
-        const user = new User();
-        const errorsOne = await validate(user);
-        user.email = 'test@test.com';
-        const errorsTwo = await validate(user);
-        expect(errorsOne.length).toBeGreaterThan(errorsTwo.length);
-        done();
-    });
+  test('User should always have a email', async (done) => {
+    const user = new User();
+    const errorsOne = await user.classValidate({ toJson: false });
+    user.email = 'user1@mail.ru';
+    const errorsTwo = await user.classValidate({ toJson: false });
+    expect(errorsOne.length).toBeGreaterThan(errorsTwo.length);
 
-    test('User validation should succeed with all required fields', async (done) => {
-        const user = new User();
-        user.firstName = 'TestName';
-        user.lastName = 'TestName';
-        user.email = 'test@test.com';
-        user.username = 'test';
-        user.password = '1234';
-        const errors = await validate(user);
-        expect(errors.length).toEqual(0);
-        done();
-    });
+    done();
+  });
 
+  test('User should always have a password', async (done) => {
+    const user = new User();
+    const errorsOne = await user.classValidate({ toJson: false });
+    user.password = 'secret';
+    const errorsTwo = await user.classValidate({ toJson: false });
+    expect(errorsOne.length).toBeGreaterThan(errorsTwo.length);
+
+    done();
+  });
+
+  test('User validation should succeed with all required fields', async (done) => {
+    const user = new User();
+    user.email = 'user1@mail.ru';
+    user.password = 'secret';
+    const errors = await user.classValidate({ toJson: false });
+    expect(errors.length).toEqual(0);
+
+    done();
+  });
 });
