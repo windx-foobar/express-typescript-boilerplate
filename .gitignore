@@ -1,7 +1,8 @@
 # @w3tec
 
 # Logs #
-/logs
+logs/*
+!logs/.gitkeep
 *.log
 *.log*
 
