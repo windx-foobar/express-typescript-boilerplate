@@ -1,43 +1,37 @@
-import 'module-alias/register';
-
+import path from 'path';
 import * as dotenv from 'dotenv';
-import * as path from 'path';
-
-import * as pkg from '@/package.json';
 import {
-  getOsEnv, getOsEnvOptional, getOsPath, getOsPaths, normalizePort, toBool, toNumber
-} from './lib/env';
+  getOsEnv,
+  getOsEnvOptional,
+  getOsPath,
+  getOsPaths,
+  normalizePort,
+  toBool,
+  toNumber
+} from '../lib';
 
-/**
- * Load .env file or for tests the .env.test file.
- */
+import * as _pkg from '@/package.json';
+
+const envName = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
 dotenv.config({
   path: path.join(
     process.cwd(),
-    `.env${(
-      (
-        process.env.NODE_ENV === 'test'
-      ) ? '.test' : ''
-    )}`
+    envName
   )
 });
 
-/**
- * Environment variables
- */
-export const env = {
-  node: process.env.NODE_ENV || 'development',
-  isProduction: process.env.NODE_ENV === 'production',
-  isTest: process.env.NODE_ENV === 'test',
-  isDevelopment: process.env.NODE_ENV === 'development',
+const nodeEnv = process.env.NODE_ENV || 'development';
+const pkg = _pkg as any;
+export const config = {
+  node: nodeEnv,
+  isProduction: nodeEnv === 'production',
+  isTest: nodeEnv === 'test',
+  isDevelopment: nodeEnv === 'development',
+  isStaging: process.env.NODE_ENV === 'staging',
   app: {
     name: getOsEnv('APP_NAME'),
-    version: (
-      pkg as any
-    ).version,
-    description: (
-      pkg as any
-    ).description,
+    version: pkg.version,
+    description: pkg.description,
     host: getOsEnv('APP_HOST'),
     schema: getOsEnv('APP_SCHEMA'),
     routePrefix: getOsEnv('APP_ROUTE_PREFIX'),
@@ -69,23 +63,5 @@ export const env = {
     database: getOsEnv('SEQUELIZE_DATABASE')/*,
      synchronize: toBool(getOsEnvOptional('SEQUELIZE_SYNCHRONIZE')),
      logging: toBool(getOsEnv('SEQUELIZE_LOGGING'))*/
-  }/*,
-   graphql: {
-   enabled: toBool(getOsEnv('GRAPHQL_ENABLED')),
-   route: getOsEnv('GRAPHQL_ROUTE'),
-   editor: toBool(getOsEnv('GRAPHQL_EDITOR'))
-   },
-   swagger: {
-   enabled: toBool(getOsEnv('SWAGGER_ENABLED')),
-   route: getOsEnv('SWAGGER_ROUTE'),
-   file: getOsEnv('SWAGGER_FILE'),
-   username: getOsEnv('SWAGGER_USERNAME'),
-   password: getOsEnv('SWAGGER_PASSWORD')
-   },
-   monitor: {
-   enabled: toBool(getOsEnv('MONITOR_ENABLED')),
-   route: getOsEnv('MONITOR_ROUTE'),
-   username: getOsEnv('MONITOR_USERNAME'),
-   password: getOsEnv('MONITOR_PASSWORD')
-   }*/
+  }
 };
