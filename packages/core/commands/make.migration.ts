@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import moment from 'moment';
 import chalk from 'chalk';
-import { env } from '../env';
 import commander from 'commander';
+import { config } from '../config';
 
 commander
   .option(
@@ -13,7 +13,7 @@ commander
   .option(
     '--migrations-path <path>',
     'migrations path',
-    env.app.dirs.migrationsDir
+    config.app.dirs.migrationsDir
   )
   .parse(process.argv);
 

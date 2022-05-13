@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import moment from 'moment';
 import chalk from 'chalk';
-import { env } from '../env';
 import commander from 'commander';
+import { config } from '../config';
 
 commander
   .option(
@@ -13,7 +13,7 @@ commander
   .option(
     '--seeders-path <path>',
     'seeders path',
-    path.resolve(env.app.dirs.migrationsDir, '../seeds')
+    path.resolve(config.app.dirs.migrationsDir, '../seeds')
   )
   .parse(process.argv);
 

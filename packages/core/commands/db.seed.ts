@@ -1,13 +1,14 @@
 import chalk from 'chalk';
-import { env } from '../env';
 import { exec } from '../utils';
 import commander from 'commander';
+import path from 'path';
+import { config } from '../config';
 
 commander
   .option(
     '--seeds <path>',
     'add filepath for your seeds',
-    './database/seeds'
+    path.resolve(config.app.dirs.migrationsDir, '../seeds')
   )
   .option(
     '--run <seeds>',
@@ -49,7 +50,7 @@ function makeCommandName(
 async function run() {
   const log = console.log;
 
-  const { host, port, username, password, type, database } = env.db;
+  const { host, port, username, password, type, database } = config.db;
 
   const connectionString = `${type}://${username}:${password}@${host}:${port}/${database}`;
 

@@ -1,11 +1,11 @@
 import chalk from 'chalk';
-import { env } from '../env';
 import { exec } from '../utils';
+import { config } from '../config';
 
 async function run() {
   const log = console.log;
 
-  const { host, port, username, password, type, database } = env.db;
+  const { host, port, username, password, type, database } = config.db;
 
   const connectionString = `${type}://${username}:${password}@${host}:${port}/${database}`;
 
@@ -14,7 +14,7 @@ async function run() {
       'ts-node --transpileOnly',
       './node_modules/sequelize-cli/lib/sequelize',
       'db:migrate:undo:all',
-      `--migrations-path=${env.app.dirs.migrationsDir}`,
+      `--migrations-path=${config.app.dirs.migrationsDir}`,
       `--url=${connectionString}`
     ].join(' '));
 
