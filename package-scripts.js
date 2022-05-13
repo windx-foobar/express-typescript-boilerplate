@@ -11,7 +11,7 @@ module.exports = {
      * Starts the builded app from the dist directory.
      */
     start: {
-      script: 'cross-env NODE_ENV=production node -r module-alias/register dist/public/index.js',
+      script: 'cross-env NODE_ENV=production node dist/public/index.js',
       description: 'Starts the builded app'
     },
     /**
@@ -21,13 +21,13 @@ module.exports = {
       inspector: {
         script: series(
           'nps banner.serve',
-          'nodemon --watch app --watch database --watch public --watch .env --inspect'
+          'nodemon --inspect'
         ),
         description: 'Serves the current app and watches for changes to restart it, you may attach inspector to it.'
       },
       script: series(
         'nps banner.serve',
-        'nodemon --watch app --watch database --watch public --watch .env'
+        'nodemon'
       ),
       description: 'Serves the current app and watches for changes to restart it'
     },
@@ -46,7 +46,7 @@ module.exports = {
      */
     config: {
       script: series(
-        runFast('./app/commands/tsconfig.ts')
+        runFast('./packages/core/commands/tsconfig.ts')
       ),
       hiddenFromHelp: true
     },
@@ -70,7 +70,7 @@ module.exports = {
      * Runs TSLint over your project
      */
     lint: {
-      script: tslint(`./{app,public,packages}/**/*.ts`),
+      script: tslint(`./{app,public,packages,global}/**/*.ts`),
       hiddenFromHelp: true
     },
     /**
@@ -212,15 +212,15 @@ module.exports = {
           hiddenFromHelp: true
         },
         run: {
-          script: 'cross-env NODE_ENV=test jest --testPathPattern=unit',
+          script: 'cross-env NODE_ENV=test jest --testPathPattern=unit --testPathIgnorePatterns=__tests',
           hiddenFromHelp: true
         },
         verbose: {
-          script: 'nps "test --verbose"',
+          script: 'nps "test.unit --verbose"',
           hiddenFromHelp: true
         },
         coverage: {
-          script: 'nps "test --coverage"',
+          script: 'nps "test.unit --coverage"',
           hiddenFromHelp: true
         }
       },
@@ -239,15 +239,15 @@ module.exports = {
         },
         run: {
           // -i. Run all tests serially in the current process, rather than creating a worker pool of child processes that run tests. This can be useful for debugging.
-          script: 'cross-env NODE_ENV=test jest --testPathPattern=integration -i',
+          script: 'cross-env NODE_ENV=test jest --testPathPattern=integration -i --testPathIgnorePatterns=__tests',
           hiddenFromHelp: true
         },
         verbose: {
-          script: 'nps "test --verbose"',
+          script: 'nps "test.integration --verbose"',
           hiddenFromHelp: true
         },
         coverage: {
-          script: 'nps "test --coverage"',
+          script: 'nps "test.integration --coverage"',
           hiddenFromHelp: true
         }
       },
@@ -266,15 +266,15 @@ module.exports = {
         },
         run: {
           // -i. Run all tests serially in the current process, rather than creating a worker pool of child processes that run tests. This can be useful for debugging.
-          script: 'cross-env NODE_ENV=test jest --testPathPattern=e2e -i',
+          script: 'cross-env NODE_ENV=test jest --testPathPattern=e2e --testPathIgnorePatterns=__tests -i',
           hiddenFromHelp: true
         },
         verbose: {
-          script: 'nps "test --verbose"',
+          script: 'nps "test.e2e --verbose"',
           hiddenFromHelp: true
         },
         coverage: {
-          script: 'nps "test --coverage"',
+          script: 'nps "test.e2e --coverage"',
           hiddenFromHelp: true
         }
       }
@@ -322,7 +322,7 @@ function banner(name) {
     hiddenFromHelp: true,
     silent: true,
     description: `Shows ${name} banners to the console`,
-    script: runFast(`./app/commands/banner.ts ${name}`)
+    script: runFast(`./packages/core/commands/banner.ts ${name}`)
   };
 }
 
