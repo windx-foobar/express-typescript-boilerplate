@@ -12,7 +12,7 @@ export abstract class Model<TModelAttributes extends {} = any,
 
   public async classValidate(
     { toJson = true, ...options }: Partial<ClassValidateOptions> = {}
-  ): Promise<ValidationError[] | void> {
+  ): Promise<ValidationError[]> {
     const result = await validate(this, options);
 
     if (result.length) {
@@ -22,7 +22,7 @@ export abstract class Model<TModelAttributes extends {} = any,
         for (const validationError of result) {
           const currentResult = transformed[validationError.property] = [];
 
-          for (const constraintKey of Object.keys(validationError.constraints)) {
+          for (const constraintKey of Object.keys(validationError.constraints).reverse()) {
             currentResult.push(validationError.constraints[constraintKey]);
           }
         }
@@ -32,5 +32,7 @@ export abstract class Model<TModelAttributes extends {} = any,
 
       return result;
     }
+
+    return [];
   }
 }
