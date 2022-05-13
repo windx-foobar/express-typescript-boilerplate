@@ -1,6 +1,6 @@
 {
-  "name": "express-typescript-boilerplate",
-  "version": "3.2.0",
+  "name": "express-typescript-wxplate",
+  "version": "0.0.1",
   "description": "A delightful way to building a Node.js RESTful API Services with beautiful code written in TypeScript",
   "main": "public/index.ts",
   "scripts": {
@@ -13,8 +13,7 @@
     "test:e2e": "npm start test.e2e",
     "build": "npm start build",
     "presetup": "yarn install",
-    "setup": "npm start config && npm start setup.script",
-    "execute": "node -r ts-node/register -r module-alias/register"
+    "setup": "npm start config && npm start setup.script"
   },
   "engines": {
     "node": ">= 14"
