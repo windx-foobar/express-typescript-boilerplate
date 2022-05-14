@@ -31,7 +31,7 @@ export class ErrorHandlerMiddleware implements ExpressErrorMiddlewareInterface {
         error = new InternalServerError('Unrecognized error');
     }
 
-    response.status(error?.httpStatus || 500)
+    response.status(error?.httpCode || 500)
       .json({
         name: error.name,
         message: error.message,
