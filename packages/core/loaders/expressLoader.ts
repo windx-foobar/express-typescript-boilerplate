@@ -4,14 +4,13 @@ import { createExpressServer } from 'routing-controllers';
 import { config } from '../config';
 import { getPath } from '../lib/env';
 
-// import { authorizationChecker } from '../auth/authorizationChecker';
-// import { currentUserChecker } from '../auth/currentUserChecker';
+import { authorizationChecker } from '../auth/authorizationChecker';
 
 export const expressLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ): void => {
   if (settings) {
-    // const connection = settings.getData('connection');
+    const connection = settings.getData('connection');
 
     /**
      * We create a new express server instance.
@@ -27,17 +26,14 @@ export const expressLoader: MicroframeworkLoader = (
        * Here we specify what controllers should be registered in our express server.
        */
       controllers: config.app.dirs.controllers,
-      middlewares: [
-        getPath('global/middlewares/*Middleware.ts'),
-        ...config.app.dirs.middlewares
-      ]
+      middlewares: [getPath('global/middlewares/*Middleware.ts')],
       // interceptors: env.app.dirs.interceptors
 
       /**
        * Authorization features
        */
-      // authorizationChecker: authorizationChecker(connection),
-      // currentUserChecker: currentUserChecker(connection)
+      authorizationChecker: authorizationChecker(connection),
+      currentUserChecker: async (action) => action.request.user
     });
 
     // Run application to listen on given port
