@@ -101,5 +101,4 @@ describe('PetModel', () => {
     }
     done();
   });
-
 });
