@@ -1,9 +1,20 @@
-import { JsonController, Get, Post, Body, Param, Delete, Put } from 'routing-controllers';
+import {
+  JsonController,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+  Authorized,
+  Req
+} from 'routing-controllers';
 import { User } from '@app/models/User';
 import { Pet } from '@app/models/Pet';
-// import { Logger, LoggerInterface } from '@packages/core/decorators/Logger';
 import { Sequelize, SequelizeInterface } from '@packages/advanced-sequelize';
 import { NotFoundError } from '@packages/core/errors';
+
+// import { Logger, LoggerInterface } from '@packages/core/decorators/Logger';
 
 @JsonController('/users')
 export class UserController {
@@ -12,6 +23,7 @@ export class UserController {
     @Sequelize() private sequelize: SequelizeInterface
   ) {}
 
+  @Authorized('users.read')
   @Get()
   public async index() {
     let transaction;
@@ -31,7 +43,31 @@ export class UserController {
     }
   }
 
-  @Get('/:id')
+  @Authorized()
+  @Get('/me/pets')
+  public async mePets(@Req() req: any) {
+    let transaction;
+    try {
+      transaction = await this.sequelize.transaction();
+
+      const petsRows: Pet[] = await req.user.$get('pets', { transaction });
+
+      await transaction.commit();
+      return petsRows.map((row) => row.toJSON());
+    } catch (error) {
+      if (transaction) await transaction.rollback();
+      throw error;
+    }
+  }
+
+  @Authorized()
+  @Get('/me')
+  public me(@Req() req: any) {
+    return req.user?.toJSON();
+  }
+
+  @Authorized('users.read')
+  @Get('/:id([0-9]+)')
   public async show(@Param('id') id: string) {
     let transaction;
 
@@ -49,6 +85,7 @@ export class UserController {
     }
   }
 
+  @Authorized('users.write')
   @Post()
   public async create(@Body() newUser: User) {
     let transaction;
@@ -68,7 +105,8 @@ export class UserController {
     }
   }
 
-  @Put('/:id')
+  @Authorized('users.write')
+  @Put('/:id([0-9]+)')
   public async update(@Param('id') id: string, @Body() updatedUser: User) {
     let transaction;
 
@@ -91,7 +129,8 @@ export class UserController {
     }
   }
 
-  @Delete('/:id')
+  @Authorized('users.write')
+  @Delete('/:id([0-9]+)')
   public async delete(@Param('id') id: string) {
     let transaction;
 
@@ -111,7 +150,8 @@ export class UserController {
     }
   }
 
-  @Get('/:id/pets')
+  @Authorized('users.read')
+  @Get('/:id([0-9]+)/pets')
   public async showPets(@Param('id') id: string) {
     let transaction;
 
@@ -132,7 +172,8 @@ export class UserController {
     }
   }
 
-  @Post('/:id/pets')
+  @Authorized(['users.write', 'pets.write'])
+  @Post('/:id([0-9]+)/pets')
   public async createPet(@Param('id') id: string, @Body() newPet: Pet) {
     let transaction;
 
