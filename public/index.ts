@@ -19,7 +19,8 @@ import {
   publicLoader,
   sequelizeLoader,
   winstonLoader,
-  homeLoader
+  homeLoader,
+  passportLoader
 } from '@packages/core/loaders';
 // import { eventDispatchLoader } from '@packages/core/loaders/eventDispatchLoader';
 // import { graphqlLoader } from './loaders/graphqlLoader';
@@ -46,6 +47,7 @@ bootstrapMicroframework({
     iocLoader,
     // eventDispatchLoader,
     sequelizeLoader,
+    passportLoader,
     expressLoader,
     // swaggerLoader,
     // monitorLoader,
