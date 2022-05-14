@@ -7,6 +7,7 @@ import {
   DefaultScope,
   HasMany
 } from 'sequelize-typescript';
+import { FindOptions } from 'sequelize';
 import { Model } from '@packages/advanced-sequelize';
 import { Pet } from '@app/models/Pet';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
@@ -76,9 +77,21 @@ export class User extends Model {
     }
   }
 
-  public async comparePassword(password: string): Promise<boolean> {
+  public async comparePassword(
+    password: string,
+    options: Pick<FindOptions, 'transaction'> = {}
+  ): Promise<boolean> {
+    let userPassword: string;
+
     try {
-      return await bcrypt.compare(password, this.password);
+      if (!this.password) {
+        const user = await User.unscoped().findByPk(this.id, options);
+        userPassword = user.password;
+      } else {
+        userPassword = this.password;
+      }
+
+      return await bcrypt.compare(password, userPassword);
     } catch (error) {
       throw error;
     }
