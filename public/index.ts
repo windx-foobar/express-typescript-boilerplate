@@ -1,11 +1,13 @@
 import 'reflect-metadata';
 
 import moduleAlias from 'module-alias';
+import packageJson from '../package.json';
 import { bootstrapMicroframework } from 'microframework-w3tec';
 
 import { replacePathToProduction } from '../packages/core/lib/env';
 
 moduleAlias.addAliases({
+  ...packageJson._moduleAliases,
   '@': replacePathToProduction('./'),
   '@packages': replacePathToProduction('packages'),
   '@app': replacePathToProduction('app')
