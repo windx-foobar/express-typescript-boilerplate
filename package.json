@@ -152,5 +152,10 @@
     "express-graphql": "^0.6.11",
     "swagger-ui-express": "4.0.1"
   },
-  "commentDevDependencies": {}
+  "commentDevDependencies": {},
+  "_moduleAlias": {
+    "@": "./",
+    "@packages": "./packages",
+    "@app": "./app"
+  }
 }
