@@ -61,7 +61,7 @@ export class Logger {
 
   private log(level: string, message: string, args: any[]): void {
     if (level === 'debug' && !config?.isProduction) {
-      console.log(message, ...args);
+      console.log('[RAW DEBUG]', message, ...args);
     } else {
       if (winston) {
         winston[level](`${this.formatScope()} ${message}`, args);
