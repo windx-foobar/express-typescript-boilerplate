@@ -5,13 +5,21 @@ import {
   BeforeCreate,
   BeforeUpdate,
   DefaultScope,
-  HasMany
+  HasMany,
+  BelongsToMany
 } from 'sequelize-typescript';
-import { FindOptions } from 'sequelize';
-import { Model } from '@packages/advanced-sequelize';
-import { Pet } from '@app/models/Pet';
+import { FindOptions, Op } from 'sequelize';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import * as bcrypt from 'bcrypt';
+import { isEqual } from 'lodash';
+import { Model } from '@packages/advanced-sequelize';
+import { Pet } from '@app/models/Pet';
+import { Role } from '@app/models/Role';
+import { UserRole } from '@app/models/UserRole';
+
+interface CanFindOptions extends Pick<FindOptions, 'transaction'> {
+  rolesNames?: string[];
+}
 
 @DefaultScope(() => (
   {
@@ -65,6 +73,9 @@ export class User extends Model {
   @HasMany(() => Pet)
   public pets: Pet[];
 
+  @BelongsToMany(() => Role, () => UserRole)
+  public roles: Role[];
+
   public async hashPassword(): Promise<void> {
     if (!this.changed('password')) return;
     try {
@@ -92,6 +103,74 @@ export class User extends Model {
       }
 
       return await bcrypt.compare(password, userPassword);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async can(
+    permissions: string[],
+    options: CanFindOptions = {}
+  ) {
+    try {
+      const { transaction = undefined, rolesNames = [] } = options;
+      const where = {} as any;
+
+      if (rolesNames?.length) {
+        where.name = { [Op.in]: rolesNames };
+      }
+
+      const roles = await this.$get('roles', {
+        transaction,
+        include: [{ association: 'permissions' }],
+        where
+      });
+
+      if (!permissions?.length) return !!roles?.length;
+
+      const userPermissions = [];
+
+      roles.forEach((role) => {
+        const localPermissions = Array.isArray(role?.permissions)
+          ? role.permissions
+          : [];
+
+        userPermissions.push(...localPermissions.map((permission) => permission.name));
+      });
+
+      const filteredPermissions = permissions.filter((permission) => {
+        return !!userPermissions
+          .filter((userPermission) => {
+            if (permission === userPermission) return true;
+
+            if (userPermission.endsWith('self-write') || userPermission.endsWith('write')) {
+              if (permission === userPermission.replace(/(self-)?write/, 'self-read')) {
+                return true;
+              }
+
+              if (permission === userPermission.replace(/(self-)?write/, 'read')) {
+                return true;
+              }
+            }
+
+            if (userPermission.endsWith('self-write')) {
+              if (permission === userPermission.replace(/self-write/, 'write')) {
+                return true;
+              }
+            }
+
+            if (userPermission.endsWith('self-read')) {
+              if (permission === userPermission.replace(/self-read/, 'read')) {
+                return true;
+              }
+            }
+
+            return false;
+          })
+          .length;
+      });
+
+      return isEqual(filteredPermissions, permissions);
     } catch (error) {
       throw error;
     }
