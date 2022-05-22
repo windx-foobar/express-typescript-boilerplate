@@ -8,10 +8,11 @@ import {
   Put,
   BodyParam
 } from 'routing-controllers';
-import { User } from '@app/models/User';
-import { Pet } from '@app/models/Pet';
 import { Sequelize, SequelizeInterface } from '@packages/advanced-sequelize';
 import { NotFoundError, BadRequestError } from '@packages/core/errors';
+import { Can } from '@packages/core/decorators';
+import { User } from '@app/models/User';
+import { Pet } from '@app/models/Pet';
 import { Maybe } from '@packages/core/utils';
 
 // import { Logger, LoggerInterface } from '@packages/core/decorators/Logger';
@@ -63,6 +64,7 @@ export class PetController {
     }
   }
 
+  @Can('pets.write')
   @Post()
   public async create(@Body() newPet: Pet) {
     let transaction;
@@ -82,6 +84,7 @@ export class PetController {
     }
   }
 
+  @Can('pets.write')
   @Put('/:id')
   public async update(@Param('id') id: string, @Body() updatedPet: Pet) {
     let transaction;
@@ -105,6 +108,7 @@ export class PetController {
     }
   }
 
+  @Can('pets.write')
   @Delete('/:id')
   public async delete(@Param('id') id: string) {
     let transaction;
@@ -125,6 +129,7 @@ export class PetController {
     }
   }
 
+  @Can(['pets.write', 'users.write'])
   @Put('/:id/user')
   public async castUser(
     @Param('id') id: string,

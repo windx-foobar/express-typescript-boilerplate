@@ -6,13 +6,14 @@ import {
   Param,
   Delete,
   Put,
-  Authorized,
   Req
 } from 'routing-controllers';
-import { User } from '@app/models/User';
-import { Pet } from '@app/models/Pet';
 import { Sequelize, SequelizeInterface } from '@packages/advanced-sequelize';
 import { NotFoundError } from '@packages/core/errors';
+import { Can } from '@packages/core/decorators';
+import { User } from '@app/models/User';
+import { Pet } from '@app/models/Pet';
+import { UserService } from '@app/services/UserService';
 
 // import { Logger, LoggerInterface } from '@packages/core/decorators/Logger';
 
@@ -20,10 +21,11 @@ import { NotFoundError } from '@packages/core/errors';
 export class UserController {
   constructor(
     // @Logger(__filename) private logger: LoggerInterface,
-    @Sequelize() private sequelize: SequelizeInterface
+    @Sequelize() private sequelize: SequelizeInterface,
+    private userService: UserService
   ) {}
 
-  @Authorized('users.read')
+  @Can('users.read', 'super_admin')
   @Get()
   public async index() {
     let transaction;
@@ -43,7 +45,7 @@ export class UserController {
     }
   }
 
-  @Authorized()
+  @Can('pets.self-read')
   @Get('/me/pets')
   public async mePets(@Req() req: any) {
     let transaction;
@@ -60,13 +62,32 @@ export class UserController {
     }
   }
 
-  @Authorized()
+  @Can('users.read', ['user', 'super_admin'])
   @Get('/me')
   public me(@Req() req: any) {
     return req.user?.toJSON();
   }
 
-  @Authorized('users.read')
+  @Can('users.read', ['user', 'super_admin'])
+  @Put('/me')
+  public async meUpdate(@Req() req: any, @Body() data: User) {
+    let transaction;
+
+    try {
+      transaction = await this.sequelize.transaction();
+
+      const user = req.user;
+      const updatedUser = await this.userService.update(user, data, { transaction });
+
+      await transaction.commit();
+      return updatedUser.toJSON();
+    } catch (error) {
+      if (transaction) await transaction.rollback();
+      throw error;
+    }
+  }
+
+  @Can('users.read', 'super_admin')
   @Get('/:id([0-9]+)')
   public async show(@Param('id') id: string) {
     let transaction;
@@ -85,7 +106,7 @@ export class UserController {
     }
   }
 
-  @Authorized('users.write')
+  @Can('users.write')
   @Post()
   public async create(@Body() newUser: User) {
     let transaction;
@@ -105,31 +126,26 @@ export class UserController {
     }
   }
 
-  @Authorized('users.write')
+  @Can('users.write')
   @Put('/:id([0-9]+)')
-  public async update(@Param('id') id: string, @Body() updatedUser: User) {
+  public async update(@Param('id') id: string, @Body() data: User) {
     let transaction;
 
     try {
       transaction = await this.sequelize.transaction();
 
-      const userRow = await User.findByPk(id, { transaction });
-      if (!userRow) throw new NotFoundError('Пользователь не найден');
-
-      await updatedUser.classValidate({
-        skipMissingProperties: true
-      });
-      await userRow.update({ ...updatedUser.toJSON() }, { transaction });
+      const user = await User.findByPk(id, { transaction });
+      const updatedUser = await this.userService.update(user, data, { transaction });
 
       await transaction.commit();
-      return userRow.toJSON();
+      return updatedUser.toJSON();
     } catch (error) {
       if (transaction) await transaction.rollback();
       throw error;
     }
   }
 
-  @Authorized('users.write')
+  @Can('users.write')
   @Delete('/:id([0-9]+)')
   public async delete(@Param('id') id: string) {
     let transaction;
@@ -150,7 +166,7 @@ export class UserController {
     }
   }
 
-  @Authorized('users.read')
+  @Can('users.read', 'super_admin')
   @Get('/:id([0-9]+)/pets')
   public async showPets(@Param('id') id: string) {
     let transaction;
@@ -172,7 +188,7 @@ export class UserController {
     }
   }
 
-  @Authorized(['users.write', 'pets.write'])
+  @Can(['users.write', 'pets.write'])
   @Post('/:id([0-9]+)/pets')
   public async createPet(@Param('id') id: string, @Body() newPet: Pet) {
     let transaction;
