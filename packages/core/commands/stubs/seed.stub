@@ -13,5 +13,7 @@ module.exports = {
      * Put revert seed code here
      * @see https://sequelize.org/docs/v6/other-topics/migrations/#creating-the-first-seed
      */
+
+     return true;
   }
 };
