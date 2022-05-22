@@ -1,35 +1,51 @@
 import { Action } from 'routing-controllers';
 import { Sequelize } from 'sequelize-typescript';
-import { UnauthorizedError } from '@packages/core/errors';
 import passport from 'passport';
+import { UnauthorizedError, ForbiddenError } from '@packages/core/errors';
 
 import { Logger } from '../lib/logger';
 
 export function authorizationChecker(
   connection: Sequelize
-): (action: Action, roles: any[]) => Promise<boolean> | boolean {
+): (
+  action: Action,
+  [roles, permissions]: [string[], string[]]
+) => Promise<boolean> | boolean {
   const log = new Logger(__filename);
 
   return function innerAuthorizationChecker(
     action: Action,
-    roles: string[]
+    [roles, permissions]: [string[], string[]]
   ): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       passport.authenticate(
         'basic',
-        (err, user) => {
-          if (err) {
-            log.error(err);
-            return reject(err);
-          }
+        async (err, user) => {
+          const transaction = await connection.transaction();
 
-          if (!user) {
-            log.warn('Invalid credentials');
-            return reject(new UnauthorizedError('Требуется авторизация'));
-          }
+          try {
+            if (err) {
+              log.error(err);
+              return reject(err);
+            }
 
-          action.request.user = user;
-          return resolve(true);
+            if (!user) {
+              log.warn('Invalid credentials');
+              return reject(new UnauthorizedError('Требуется авторизация'));
+            }
+
+            const canAction = await user.can(permissions, {
+              transaction,
+              rolesNames: roles
+            });
+            if (!canAction) return reject(new ForbiddenError('Недостаточно прав'));
+
+            await transaction.commit();
+            action.request.user = user;
+            return resolve(true);
+          } catch (error) {
+            return reject(error);
+          }
         }
       )(action.request, action.response, action.next);
     });
