@@ -335,11 +335,11 @@ function copyDir(source, target) {
 }
 
 function run(path) {
-  return `ts-node ${path}`;
+  return `ts-node -r module-alias/register ${path}`;
 }
 
 function runFast(path) {
-  return `ts-node --transpileOnly ${path}`;
+  return `ts-node -r module-alias/register --transpileOnly ${path}`;
 }
 
 function tslint(path) {
