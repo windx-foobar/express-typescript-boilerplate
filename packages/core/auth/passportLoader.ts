@@ -1,12 +1,15 @@
 import { MicroframeworkLoader, MicroframeworkSettings } from 'microframework-w3tec';
-import passport from 'passport';
+import { Passport } from 'passport';
 import { BasicStrategy } from 'passport-http';
-import { User } from '@app/models/User';
+import { Sequelize } from 'sequelize-typescript';
 
 export const passportLoader: MicroframeworkLoader = (
   options?: MicroframeworkSettings
 ) => {
-  if (options && options?.getData('connection')) {
+  const sequelize: Sequelize = options.getData('connection');
+  const passport = new Passport();
+
+  if (sequelize) {
     passport.use(
       'basic',
       new BasicStrategy(
@@ -14,6 +17,10 @@ export const passportLoader: MicroframeworkLoader = (
           if (!email || !password) return done(undefined, false);
 
           try {
+            // В loader нельзя использовать модели напрямую
+            // Нужно вытаскивать их из sequelize
+            const User: any = sequelize.models.User;
+
             const user = await User.findOne({ where: { email } });
             if (!user) return done(undefined, false);
 
@@ -28,4 +35,6 @@ export const passportLoader: MicroframeworkLoader = (
       )
     );
   }
+
+  options.setData('passport', passport);
 };
