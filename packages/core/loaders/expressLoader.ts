@@ -11,6 +11,7 @@ export const expressLoader: MicroframeworkLoader = (
 ): void => {
   if (settings) {
     const connection = settings.getData('connection');
+    const passport = settings.getData('passport');
 
     /**
      * We create a new express server instance.
@@ -27,12 +28,11 @@ export const expressLoader: MicroframeworkLoader = (
        */
       controllers: config.app.dirs.controllers,
       middlewares: [getPath('global/middlewares/*Middleware.ts')],
-      // interceptors: env.app.dirs.interceptors
 
       /**
        * Authorization features
        */
-      authorizationChecker: authorizationChecker(connection),
+      authorizationChecker: authorizationChecker(connection, passport),
       currentUserChecker: async (action) => action.request.user
     });
 
