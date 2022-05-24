@@ -1,17 +1,12 @@
 import 'reflect-metadata';
 
-import moduleAlias from 'module-alias';
 import packageJson from '../package.json';
+import { replacePathToProduction } from '../packages/core/lib/env/utils';
+import registerAliases from '../packages/core/lib/module-alias';
+
+registerAliases(packageJson._moduleAliases, replacePathToProduction);
+
 import { bootstrapMicroframework } from 'microframework-w3tec';
-
-import { replacePathToProduction } from '../packages/core/lib/env';
-
-moduleAlias.addAliases({
-  ...packageJson._moduleAliases,
-  '@': replacePathToProduction('./'),
-  '@packages': replacePathToProduction('packages'),
-  '@app': replacePathToProduction('app')
-});
 
 import { banner } from '@packages/core/lib/banner';
 import { Logger } from '@packages/core/lib/logger';
