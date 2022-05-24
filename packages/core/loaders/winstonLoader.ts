@@ -4,6 +4,11 @@ import 'winston-daily-rotate-file';
 import { config } from '../config';
 import path from 'path';
 
+/**
+ * winstonLoader
+ * ------------------------------
+ * Загрузчик winston логгирования приложения со всеми транспортами
+ */
 export const winstonLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ): void => {

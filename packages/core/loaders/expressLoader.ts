@@ -6,6 +6,11 @@ import { getPath } from '../lib/env';
 
 import { authorizationChecker } from '../auth/authorizationChecker';
 
+/**
+ * expressLoader
+ * ------------------------------
+ * Загрузчик express приложения
+ */
 export const expressLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ): void => {

@@ -3,6 +3,11 @@ import { Passport } from 'passport';
 import { BasicStrategy } from 'passport-http';
 import { Sequelize } from 'sequelize-typescript';
 
+/**
+ * passportLoader
+ * ------------------------------
+ * Загрузчик passport и стратегии-примера
+ */
 export const passportLoader: MicroframeworkLoader = (
   options?: MicroframeworkSettings
 ) => {

@@ -2,6 +2,11 @@ import * as express from 'express';
 import { MicroframeworkLoader, MicroframeworkSettings } from 'microframework-w3tec';
 import { config } from '../config';
 
+/**
+ * homeLoader
+ * ------------------------------
+ * Загрузчик базового маршрута /api с информацией о сервере
+ */
 export const homeLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ): void => {

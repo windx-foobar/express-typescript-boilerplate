@@ -3,6 +3,11 @@ import { MicroframeworkLoader, MicroframeworkSettings } from 'microframework-w3t
 import * as path from 'path';
 import favicon from 'serve-favicon';
 
+/**
+ * publicLoader
+ * ------------------------------
+ * Регистрация статики в express
+ */
 export const publicLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ): void => {

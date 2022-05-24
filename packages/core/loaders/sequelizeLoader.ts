@@ -4,6 +4,12 @@ import { Container } from 'typedi';
 import { config } from '@packages/core/config';
 import { Logger } from '@packages/core/lib/logger';
 
+/**
+ * sequelizeLoader
+ * ------------------------------
+ * Загрузчик движка sequelize. Определение логгинга и моделей, а так же определение его в контейнере
+ * для использования декоратора @Sequelize
+ */
 export const sequelizeLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ): Promise<void> => {
