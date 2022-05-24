@@ -1,21 +1,22 @@
 import { Action } from 'routing-controllers';
 import { Sequelize } from 'sequelize-typescript';
-import passport from 'passport';
+import { PassportStatic } from 'passport';
 import { UnauthorizedError, ForbiddenError } from '@packages/core/errors';
 
 import { Logger } from '../lib/logger';
 
 export function authorizationChecker(
-  connection: Sequelize
+  connection: Sequelize,
+  passport: PassportStatic
 ): (
   action: Action,
-  [roles, permissions]: [string[], string[]]
+  [roles, permissions]: any[]
 ) => Promise<boolean> | boolean {
   const log = new Logger(__filename);
 
   return function innerAuthorizationChecker(
     action: Action,
-    [roles, permissions]: [string[], string[]]
+    [roles, permissions]: any[]
   ): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       passport.authenticate(
