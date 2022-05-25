@@ -5,3 +5,4 @@ export * from './publicLoader';
 export * from './sequelizeLoader';
 export * from './winstonLoader';
 export * from '../auth/passportLoader';
+export * from './eventDispatchLoader';

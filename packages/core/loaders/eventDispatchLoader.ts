@@ -1,7 +1,7 @@
-import glob from 'glob';
 import { MicroframeworkLoader, MicroframeworkSettings } from 'microframework-w3tec';
 
-import { env } from '../env';
+import { config } from '@packages/core/config';
+import { glob } from '@packages/core/utils';
 
 /**
  * eventDispatchLoader
@@ -9,17 +9,20 @@ import { env } from '../env';
  * This loads all the created subscribers into the project, so we do not have to
  * import them manually
  */
-export const eventDispatchLoader: MicroframeworkLoader = (
+export const eventDispatchLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings) {
-    const patterns = env.app.dirs.subscribers;
-    patterns.forEach((pattern) => {
-      glob(pattern, (err: any, files: string[]) => {
+    const patterns = config.app.dirs.subscribers;
+
+    await Promise.all(
+      patterns.map(async (pattern) => {
+        const files = await glob(pattern);
+
         for (const file of files) {
           require(file);
         }
-      });
-    });
+      })
+    );
   }
 };
