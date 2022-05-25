@@ -43,9 +43,9 @@ export const config = {
       entities: getOsPaths('SEQUELIZE_ENTITIES'),
       entitiesDir: getOsPath('SEQUELIZE_ENTITIES_DIR'),
       controllers: getOsPaths('CONTROLLERS'),
-      middlewares: getOsPaths('MIDDLEWARES')/*,
+      middlewares: getOsPaths('MIDDLEWARES'),
+      subscribers: getOsPaths('SUBSCRIBERS')/*,
        interceptors: getOsPaths('INTERCEPTORS'),
-       subscribers: getOsPaths('SUBSCRIBERS'),
        resolvers: getOsPaths('RESOLVERS')*/
     }
   },
