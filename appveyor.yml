@@ -4,6 +4,10 @@ environment:
   DB_DATABASE: "./mydb.sql"
   DB_LOGGING: false
 
+branches:
+  only:
+    - master
+
 install:
   - ps: Install-Product node $env:nodejs_version
   - yarn install

@@ -3,10 +3,12 @@ node_js:
   - "14.0.0"
 install:
   - yarn install
-env:
-  - DB_TYPE="sqlite" DB_DATABASE="./mydb.sql" DB_LOGGING=false
 script:
   - npm start test
   - npm start build
 notifications:
   email: false
+
+branches:
+  only:
+    - master
