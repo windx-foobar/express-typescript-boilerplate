@@ -8,9 +8,11 @@ import {
   Put,
   Req
 } from 'routing-controllers';
+
 import { Sequelize, SequelizeInterface } from '@packages/advanced-sequelize';
 import { NotFoundError } from '@packages/core/errors';
 import { Can } from '@packages/core/decorators';
+
 import { User } from '@app/models/User';
 import { Pet } from '@app/models/Pet';
 import { UserService } from '@app/services/UserService';
@@ -114,9 +116,7 @@ export class UserController {
     try {
       transaction = await this.sequelize.transaction();
 
-      await newUser.classValidate();
-
-      const userRow = await newUser.save({ transaction });
+      const userRow = await this.userService.create(newUser, { transaction });
 
       await transaction.commit();
       return userRow.toJSON();
