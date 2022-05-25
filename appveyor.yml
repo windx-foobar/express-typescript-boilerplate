@@ -1,5 +1,5 @@
 environment:
-  nodejs_version: "8"
+  nodejs_version: "14"
   DB_TYPE: "sqlite"
   DB_DATABASE: "./mydb.sql"
   DB_LOGGING: false
@@ -13,5 +13,3 @@ build_script:
 
 test_script:
   - npm start test
-  - npm start test.integration
-  - npm start test.e2e
