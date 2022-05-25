@@ -11,7 +11,7 @@ async function run() {
 
   try {
     const { stdout, stderr } = await exec([
-      'ts-node --transpileOnly',
+      'ts-node -T',
       './node_modules/sequelize-cli/lib/sequelize',
       'db:migrate:undo:all',
       `--migrations-path=${config.app.dirs.migrationsDir}`,

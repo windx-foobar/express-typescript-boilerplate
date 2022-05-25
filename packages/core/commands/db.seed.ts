@@ -59,7 +59,7 @@ async function run() {
     const commandName = makeCommandName(seedsNames, !!commander.revert);
 
     const { stdout, stderr } = await exec([
-      'ts-node --transpileOnly',
+      'ts-node -T',
       './node_modules/sequelize-cli/lib/sequelize',
       commandName,
       `--seeders-path=${commander.seeds}`,

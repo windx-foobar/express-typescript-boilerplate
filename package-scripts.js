@@ -339,7 +339,7 @@ function run(path) {
 }
 
 function runFast(path) {
-  return `ts-node -r module-alias/register --transpileOnly ${path}`;
+  return `ts-node -r module-alias/register -T ${path}`;
 }
 
 function tslint(path) {
