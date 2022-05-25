@@ -1,5 +1,5 @@
 import { User } from '@/app/models/User';
-import { createDatabaseConnection, closeDatabase, createTables } from '../utils/database';
+import { createDatabaseConnection, closeDatabase, createTables } from '../../utils/database';
 
 describe('UserModel', () => {
   let connection;
