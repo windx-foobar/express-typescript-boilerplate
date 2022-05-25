@@ -2,14 +2,14 @@ import * as nock from 'nock';
 import request from 'supertest';
 
 import { User } from '@app/models/User';
-import { closeDatabase, createSuperAdmin } from '../../utils/database';
+import { closeDatabase, createSuperAdmin, createRoles } from '../../utils/database';
 import { BootstrapSettings } from '../utils/bootstrap';
 import { prepareServer } from '../utils/server';
 
 describe('/api/users', () => {
 
   let superAdmin: User;
-  // let bruceAuthorization: string;
+  let superAdminAuthorization: string;
   let settings: BootstrapSettings;
 
   // -------------------------------------------------------------------------
@@ -18,9 +18,12 @@ describe('/api/users', () => {
 
   beforeAll(async () => {
     settings = await prepareServer({ migrate: true });
+    await createRoles(settings.connection);
     await createSuperAdmin(settings.connection);
     superAdmin = await User.findOne({ where: { email: 'admin@site.com' } });
-    // bruceAuthorization = Buffer.from(`${bruce.username}:1234`).toString('base64');
+    superAdminAuthorization = Buffer
+      .from(`${superAdmin.email}:123456`)
+      .toString('base64');
   });
 
   // -------------------------------------------------------------------------
@@ -39,7 +42,7 @@ describe('/api/users', () => {
   test('GET: / should return a list of users', async (done) => {
     const response = await request(settings.app)
       .get('/api/users')
-      // .set('Authorization', `Basic ${bruceAuthorization}`)
+      .set('Authorization', `Basic ${superAdminAuthorization}`)
       .expect('Content-Type', /json/)
       .expect(200);
 
@@ -50,7 +53,7 @@ describe('/api/users', () => {
   test('GET: /:id should return superAdmin', async (done) => {
     const response = await request(settings.app)
       .get(`/api/users/${superAdmin.id}`)
-      // .set('Authorization', `Basic ${bruceAuthorization}`)
+      .set('Authorization', `Basic ${superAdminAuthorization}`)
       .expect('Content-Type', /json/)
       .expect(200);
 
