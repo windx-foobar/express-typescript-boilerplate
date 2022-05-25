@@ -4,13 +4,25 @@ import { createDatabaseConnection, closeDatabase } from '../../utils/database';
 describe('UserValidations', () => {
   let connection;
 
+  // -------------------------------------------------------------------------
+  // Setup up
+  // -------------------------------------------------------------------------
+
   beforeAll(async () => {
     connection = await createDatabaseConnection();
   });
 
+  // -------------------------------------------------------------------------
+  // Tear down
+  // -------------------------------------------------------------------------
+
   afterAll(async () => {
     await closeDatabase(connection);
   });
+
+  // -------------------------------------------------------------------------
+  // Test cases
+  // -------------------------------------------------------------------------
 
   test('User should always have a email', async (done) => {
     const user = new User();

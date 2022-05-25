@@ -10,12 +10,20 @@ describe('ErrorHandlerMiddleware', () => {
   let err;
   let res;
 
+  // -------------------------------------------------------------------------
+  // Setup up
+  // -------------------------------------------------------------------------
+
   beforeEach(() => {
     log = new LogMock();
     middleware = new ErrorHandlerMiddleware(log);
     res = new MockExpressResponse();
     err = new HttpError(400, 'Test Error');
   });
+
+  // -------------------------------------------------------------------------
+  // Test cases
+  // -------------------------------------------------------------------------
 
   test('Should not print stack out in production', () => {
     middleware.isProduction = true;
