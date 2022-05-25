@@ -1,10 +1,11 @@
 import path from 'path';
 import fs from 'fs';
 import { Sequelize, SequelizeOptions, DataType } from 'sequelize-typescript';
-import { fn } from 'sequelize';
-import bcrypt from 'bcrypt';
 import { v4 } from 'uuid';
 import { config } from '@/packages/core/config';
+import * as rolesSeed from '@/database/seeds/20220522120587-FillRolesAndPermissions';
+import * as superAdminRoleSeed from '@/database/seeds/20220522140572-FillSuperAdminRole';
+import * as superAdminSeed from '@/database/seeds/20220510161938-FillSuperAdmin';
 
 let dbName: string;
 
@@ -99,18 +100,128 @@ export const createTables = async (connection: Sequelize) => {
       }
     }
   });
+
+  await queryInterface.createTable('roles', {
+    id: {
+      type: DataType.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    name: {
+      type: DataType.STRING,
+      allowNull: false,
+      unique: true
+    },
+    description: DataType.STRING,
+    created_at: {
+      type: DataType.DATE,
+      allowNull: false
+    },
+    updated_at: {
+      type: DataType.DATE,
+      allowNull: false
+    },
+    deleted_at: DataType.DATE
+  });
+
+  await queryInterface.createTable('permissions', {
+    id: {
+      type: DataType.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    name: {
+      type: DataType.STRING,
+      allowNull: false,
+      unique: true
+    },
+    description: DataType.STRING,
+    created_at: {
+      type: DataType.DATE,
+      allowNull: false
+    },
+    updated_at: {
+      type: DataType.DATE,
+      allowNull: false
+    },
+    deleted_at: DataType.DATE
+  });
+
+  await queryInterface.createTable('roles_permissions', {
+    id: {
+      type: DataType.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    role_id: {
+      type: DataType.INTEGER,
+      references: {
+        model: {
+          tableName: 'roles'
+        },
+        key: 'id'
+      }
+    },
+    permission_id: {
+      type: DataType.INTEGER,
+      references: {
+        model: {
+          tableName: 'permissions'
+        },
+        key: 'id'
+      }
+    },
+    created_at: {
+      type: DataType.DATE,
+      allowNull: false
+    }
+  });
+
+  await queryInterface.createTable('users_roles', {
+    id: {
+      type: DataType.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    user_id: {
+      type: DataType.INTEGER,
+      references: {
+        model: {
+          tableName: 'users'
+        },
+        key: 'id'
+      }
+    },
+    role_id: {
+      type: DataType.INTEGER,
+      references: {
+        model: {
+          tableName: 'roles'
+        },
+        key: 'id'
+      }
+    },
+    created_at: {
+      type: DataType.DATE,
+      allowNull: false
+    }
+  });
+};
+
+export const createRoles = async (connection: Sequelize) => {
+  const queryInterface = await connection.getQueryInterface();
+
+  // @ts-ignore
+  await rolesSeed.up(queryInterface);
 };
 
 export const createSuperAdmin = async (connection: Sequelize) => {
   const queryInterface = await connection.getQueryInterface();
 
-  const password = await bcrypt.hash('secret', 10);
-  await queryInterface.insert(undefined, 'users', {
-    email: 'admin@site.com',
-    password,
-    created_at: fn('datetime'),
-    updated_at: fn('datetime')
-  });
+  // @ts-ignore
+  await superAdminSeed.up(queryInterface);
+  // @ts-ignore
+  await superAdminRoleSeed.up(queryInterface);
 };
 
 export const synchronizeDatabase = async (connection: Sequelize) => {
