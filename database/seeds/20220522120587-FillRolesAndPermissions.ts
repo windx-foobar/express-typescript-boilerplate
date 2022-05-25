@@ -1,4 +1,4 @@
-import { QueryInterface, fn } from 'sequelize';
+import { QueryInterface } from 'sequelize';
 
 module.exports = {
   async up(queryInterface: QueryInterface) {
@@ -63,8 +63,8 @@ module.exports = {
           rows.forEach((row) => {
             acc.push({
               ...row,
-              created_at: fn('now'),
-              updated_at: fn('now')
+              created_at: new Date(),
+              updated_at: new Date()
             });
           });
 
@@ -79,8 +79,8 @@ module.exports = {
         'roles',
         ROLES.map((row) => ({
           ...row,
-          created_at: fn('now'),
-          updated_at: fn('now')
+          created_at: new Date(),
+          updated_at: new Date()
         })),
         {
           transaction
@@ -111,7 +111,7 @@ module.exports = {
             return {
               role_id: role.id,
               permission_id: id,
-              created_at: fn('now')
+              created_at: new Date()
             };
           });
 

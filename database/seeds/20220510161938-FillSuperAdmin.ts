@@ -1,4 +1,4 @@
-import { QueryInterface, fn } from 'sequelize';
+import { QueryInterface } from 'sequelize';
 import * as bcrypt from 'bcrypt';
 
 module.exports = {
@@ -18,8 +18,8 @@ module.exports = {
     await queryInterface.insert(undefined, 'users', {
       email: 'admin@site.com',
       password,
-      created_at: fn('now'),
-      updated_at: fn('now')
+      created_at: new Date(),
+      updated_at: new Date()
     });
   },
 

@@ -1,4 +1,4 @@
-import { QueryInterface, fn } from 'sequelize';
+import { QueryInterface } from 'sequelize';
 
 module.exports = {
   async up(queryInterface: QueryInterface) {
@@ -30,7 +30,7 @@ module.exports = {
         {
           user_id: user.id,
           role_id: role.id,
-          created_at: fn('now')
+          created_at: new Date()
         },
         { transaction }
       );
