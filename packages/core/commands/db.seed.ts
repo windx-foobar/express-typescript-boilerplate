@@ -1,7 +1,7 @@
 import chalk from 'chalk';
-import { exec } from '../utils';
-import commander from 'commander';
 import path from 'path';
+import { exec, glob } from '../utils';
+import commander from 'commander';
 import { config } from '../config';
 
 commander
@@ -20,11 +20,28 @@ commander
     '--revert',
     'run revert seeds'
   )
+  .option(
+    '--last',
+    'run only last seed'
+  )
   .parse(process.argv);
 
-function makeSeedsNames(): string {
-  if (Array.isArray(commander.run)) {
-    return commander.run?.map((name: string) => `--seed=${name}`).join(' ');
+async function makeSeedsNames(): Promise<string> {
+  let seeds: any[];
+
+  if (!commander.run) {
+    seeds = await glob(path.resolve(config.app.dirs.migrationsDir, '../seeds/*.ts'));
+    seeds = seeds.map((seed) => seed.split('/').slice(-1).join(''));
+
+    if (commander.last) {
+      seeds = seeds.slice(-1);
+    }
+  } else {
+    seeds = commander?.run ?? [];
+  }
+
+  if (Array.isArray(seeds)) {
+    return seeds.map((name: string) => `--seed=${name}`).join(' ');
   }
 
   return '';
@@ -55,7 +72,12 @@ async function run() {
   const connectionString = `${type}://${username}:${password}@${host}:${port}/${database}`;
 
   try {
-    const seedsNames = makeSeedsNames();
+    if (commander.run && commander.last) {
+      log('\n👎 Error!\n', chalk.red('Опции --run и --last не могут быть переданы вместе\n\n'));
+      return process.exit(1);
+    }
+
+    const seedsNames = await makeSeedsNames();
     const commandName = makeCommandName(seedsNames, !!commander.revert);
 
     const { stdout, stderr } = await exec([
