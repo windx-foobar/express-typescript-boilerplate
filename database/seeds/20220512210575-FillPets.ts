@@ -15,12 +15,23 @@ module.exports = {
 
     const records = await Promise.all(
       Array(10).fill('')
-        .map(async (): Promise<any> => {
+        .map(async (_, idx): Promise<any> => {
+          let name: string;
+          let age: number;
+
+          if (idx === 0) {
+            name = 'Roxy';
+            age = 6;
+          } else {
+            name = faker.unique(faker.name.firstName);
+            age = faker.datatype.number({ min: 1, max: 12 });
+          }
+
           const created_at = faker.date.between('2022-02-01T00:00:00.000Z', new Date());
 
           return {
-            name: faker.unique(faker.name.firstName),
-            age: faker.datatype.number({ min: 1, max: 12 }),
+            name,
+            age,
             created_at,
             updated_at: created_at
           };
