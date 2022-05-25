@@ -13,7 +13,7 @@ describe('UserModel', () => {
     await closeDatabase(connection);
   });
 
-  test('User should compare password any scope', async (done) => {
+  test('should be compared passwords any scope', async (done) => {
     const initialUser = await User.create({ email: 'user1@mail.ru', password: 'secret' });
 
     let user = await User.unscoped().findByPk(initialUser.id);
