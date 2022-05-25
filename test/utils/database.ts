@@ -3,15 +3,25 @@ import fs from 'fs';
 import { Sequelize, SequelizeOptions, DataType } from 'sequelize-typescript';
 import { fn } from 'sequelize';
 import bcrypt from 'bcrypt';
+import { v4 } from 'uuid';
 import { config } from '@/packages/core/config';
 
+let dbName: string;
+
 export const createDatabaseConnection = async (): Promise<Sequelize> => {
+  if (config.db.type === 'sqlite') {
+    const hash = v4();
+    dbName = `./${hash}.sqlite3`;
+  } else {
+    dbName = config.db.database as any;
+  }
+
   const options: SequelizeOptions = {
     dialect: config.db.type as any,
-    storage: config.db.database,
+    storage: dbName,
     pool: {
       min: 0,
-      max: 10,
+      max: 1000,
       idle: 10000
     },
     logging: false,
@@ -109,6 +119,6 @@ export const synchronizeDatabase = async (connection: Sequelize) => {
 };
 
 export const closeDatabase = async (connection: Sequelize) => {
-  await fs.promises.unlink(path.resolve(process.cwd(), config.db.database));
+  await fs.promises.unlink(path.resolve(process.cwd(), dbName));
   return await connection.close();
 };
