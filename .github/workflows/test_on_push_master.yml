@@ -4,9 +4,23 @@ on:
       - master
 
 jobs:
-  run_tests_and_build:
-    runs-on:
-      - ubuntu-latest
+  run_on_ubuntu_latest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      - run: npm i -G yarn
+      - run: node --version
+      - run: node --version
+      - run: npm --version
+      - run: yarn --version
+      - run: yarn install
+      - run: npm start test
+      - run: npm start build
+  run_on_ubuntu_18:
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
