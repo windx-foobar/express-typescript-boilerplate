@@ -140,7 +140,6 @@ module.exports = {
       migrate: {
         script: series(
           'nps banner.migrate',
-          // 'nps config',
           runFast('./packages/core/commands/db.migrate.ts')
         ),
         description: 'Migrates the database to newest version available'
@@ -148,7 +147,6 @@ module.exports = {
       revert: {
         script: series(
           'nps banner.revert',
-          // 'nps config',
           runFast('./packages/core/commands/db.revert.ts')
         ),
         description: 'Downgrades the database'
@@ -156,7 +154,6 @@ module.exports = {
       fresh: {
         script: series(
           'nps banner.fresh',
-          // 'nps config',
           'nps db.revert',
           'nps db.migrate'
         ),
@@ -166,29 +163,15 @@ module.exports = {
         default: {
           script: series(
             'nps banner.seed',
-            // 'nps config',
             runFast(`./packages/core/commands/db.seed.ts`)
           ),
           description: 'Seeds generated records into the database'
         }
-        /*revert: {
-          script: series(
-            'nps banner.revert',
-            // 'nps config',
-            runFast(`./packages/core/commands/db.seed.ts --revert`)
-          ),
-          description: 'Drop generated records into the database'
-        }*/
       },
-      /*drop: {
-        script: runFast('./node_modules/typeorm/cli.js schema:drop'),
-        description: 'Drops the schema of the database'
-      },*/
       setup: {
         script: series(
-          // 'nps db.drop',
-          // 'nps db.migrate',
-          // 'nps db.seed'
+          'nps db.fresh',
+          'nps db.seed'
         ),
         description: 'Recreates the database with seeded data'
       }
@@ -197,7 +180,7 @@ module.exports = {
      * These run various kinds of tests. Default is unit.
      */
     test: {
-      default: 'nps test.unit',
+      default: 'nps test.unit test.integration test.e2e',
       unit: {
         default: {
           script: series(

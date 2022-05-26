@@ -8,7 +8,7 @@
     "dev": "npm start serve",
     "start:dev": "npm start serve",
     "start:dev:inspector": "npm start server.inspector",
-    "test": "npm start test.unit test.integration test.e2e",
+    "test": "npm start test",
     "test:unit": "npm start test.unit",
     "test:integration": "npm start test.integration",
     "test:e2e": "npm start test.e2e",
@@ -30,7 +30,7 @@
     "starter-kit",
     "w3tec.ch"
   ],
-  "homepage": "https://github.com/w3tec/express-typescript-boilerplate#readme",
+  "homepage": "https://github.com/windx-foobar/express-typescript-wxplate#readme",
   "author": "windx-foobar <bezalkogoln1ycoder@gmail.com>",
   "contributors": [
     {
