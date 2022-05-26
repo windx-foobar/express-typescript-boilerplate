@@ -29,6 +29,8 @@
 - **Easy API Testing** тесты писать просто, когда есть готовые примеры.
 - **Dependency Injection** красивая реализация, используя [TypeDI](https://github.com/pleerock/typedi).
 - **Simplified Database Query** используя [Sequelize v6](https://github.com/sequelize/sequelize/tree/v6.20.0).
+- **Typescript Wrapping Sequelize**
+  используя [Sequelize Typescript](https://github.com/RobinBuschmann/sequelize-typescript).
 - **Laravel based structure** используя большинство нужных слоев, таких как Controller, Middleware, Model, Service,
   Auth.
 - **Easy Exception Handling** используя [routing-controllers](https://github.com/pleerock/routing-controllers).
@@ -88,7 +90,7 @@ sudo npm i -G yarn
 Установите [MySQL](https://www.mysql.com/downloads/) или [PostgreSQL](https://www.postgresql.org/download/) по вашему
 желанию. Необязательно устанавливать сразу оба движка. Выберите какой больше нравится!
 
-> Если вы исользуете Unix системы, рекомендую устанавливать все, используя Package Manager.
+> Если вы используете Unix системы, рекомендую устанавливать все, используя Package Manager.
 
 ### Шаг 2: Создание нового проекта
 
@@ -105,3 +107,17 @@ yarn setup
 ```
 
 > Данный скрипт установит все зависимости, используя yarn. Дальше скрипт запустит начальные миграции и заполнит базу тестовыми данными.
+
+### Шаг 3: Запускаем сервер
+
+Перейдите в директорию проекта, если вы не в ней, и запустите приложение в DEV режиме, используя yarn скрипт.
+
+```bash
+yarn start serve
+```
+
+> Данный скрипт запустит локальный сервер, используя `nodemon`, который будет следить за измениями файлов приложения и перезапускать сервер.
+> В вашей командной оболочке отобразится информация, на каком `{host}:{port}` запустился сервер.
+> Попробуйте перейти по `http://{host}:{port}/api`. Вы должны увидеть информацию в JSON формате!
+
+![divider](./windx-divider.png)
