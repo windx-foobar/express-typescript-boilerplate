@@ -13,11 +13,10 @@ jobs:
           node-version: '14'
       - run: npm i -G yarn
       - run: node --version
-      - run: node --version
       - run: npm --version
       - run: yarn --version
       - run: yarn install
-      - run: npm start test
+      - run: npm run test
       - run: npm start build
   run_on_ubuntu_18:
     runs-on: ubuntu-18.04
@@ -28,9 +27,8 @@ jobs:
           node-version: '14'
       - run: npm i -G yarn
       - run: node --version
-      - run: node --version
       - run: npm --version
       - run: yarn --version
       - run: yarn install
-      - run: npm start test
+      - run: npm run test
       - run: npm start build
