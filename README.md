@@ -11,6 +11,9 @@
   <a href="https://github.com/windx-foobar/express-typescript-wxplate/actions/workflows/test_on_push_master.yml">
     <img src="https://github.com/windx-foobar/express-typescript-wxplate/actions/workflows/test_on_push_master.yml/badge.svg?branch=master" alt="github workflows" />
   </a>
+  <a href="https://github.com/windx-foobar/express-typescript-wxplate/tree/master">
+    <img src="https://img.shields.io/github/package-json/v/windx-foobar/express-typescript-wxplate/master" alt="Master Version">
+  </a>
   <a href="https://stackshare.io/windx-foobar/express-typescript-wxplate">
     <img src="https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat" alt="StackShare" />
   </a>
