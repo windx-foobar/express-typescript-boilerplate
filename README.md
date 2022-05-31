@@ -52,6 +52,7 @@
 - **API Documentation** используя [swagger](http://swagger.io/).
 - **API Monitoring** используя [express-status-monitor](https://github.com/RafalWilinski/express-status-monitor).
 - **Docker && Docker Compose** создать композицую нужных инструментов для быстрого старта.
+- **Nodemailer** отправка писем на электронную почту [nodemailer](https://nodemailer.com/about/).
 
 ![divider](./windx-divider.png)
 
@@ -180,7 +181,7 @@ yarn start serve
 
 ![divider](./windx-divider.png)
 
-## ❯ API Routes
+## ❯ Маршруты API
 
 По умолчанию префикс всех api маршрутов `/api`, но вы всегда можете изменить его в `.env`->`APP_ROUTE_PREFIX`
 The swagger and the monitor route can be altered in the `.env` file.
