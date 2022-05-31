@@ -379,4 +379,4 @@ yarn start db.seed
 
 ## ❯ TODO
 
-[MIT](/TODO)
+[Список задач](/TODO.md)
