@@ -3,9 +3,9 @@ import fs from 'fs';
 import { Sequelize, SequelizeOptions, DataType } from 'sequelize-typescript';
 import { v4 } from 'uuid';
 import { config } from '@/packages/core/config';
-import * as rolesSeed from '@/database/seeds/20220522120587-FillRolesAndPermissions';
-import * as superAdminRoleSeed from '@/database/seeds/20220522140572-FillSuperAdminRole';
-import * as superAdminSeed from '@/database/seeds/20220510161938-FillSuperAdmin';
+import rolesSeed from '@/database/seeds/20220522120587-FillRolesAndPermissions';
+import superAdminRoleSeed from '@/database/seeds/20220522140572-FillSuperAdminRole';
+import superAdminSeed from '@/database/seeds/20220510161938-FillSuperAdmin';
 
 let dbName: string;
 
