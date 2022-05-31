@@ -1,6 +1,6 @@
 {
   "name": "express-typescript-wxplate",
-  "version": "0.0.1-alpha",
+  "version": "0.0.1",
   "description": "A delightful way to building a Node.js RESTful API Services with beautiful code written in TypeScript",
   "main": "public/index.ts",
   "scripts": {
