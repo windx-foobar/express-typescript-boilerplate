@@ -1,7 +1,7 @@
 import { QueryInterface } from 'sequelize';
 import * as bcrypt from 'bcrypt';
 
-module.exports = {
+export default {
   async up(queryInterface: QueryInterface) {
     /**
      * Add seed commands here.

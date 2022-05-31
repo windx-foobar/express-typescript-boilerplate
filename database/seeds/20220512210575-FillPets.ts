@@ -1,7 +1,7 @@
 import { QueryInterface } from 'sequelize';
 import { faker } from '@faker-js/faker';
 
-module.exports = {
+export default {
   async up(queryInterface: QueryInterface) {
     /**
      * Add seed commands here.

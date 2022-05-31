@@ -1,6 +1,6 @@
 import { QueryInterface } from 'sequelize';
 
-module.exports = {
+export default {
   async up(queryInterface: QueryInterface) {
     /**
      * Put seed code here
