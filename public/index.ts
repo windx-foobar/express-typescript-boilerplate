@@ -1,11 +1,5 @@
 import 'reflect-metadata';
 
-import packageJson from '../package.json';
-import { replacePathToProduction } from '../packages/core/lib/env/utils';
-import registerAliases from '../packages/core/lib/module-alias';
-
-registerAliases(packageJson._moduleAliases, replacePathToProduction);
-
 import { bootstrapMicroframework } from 'microframework-w3tec';
 
 import { banner } from '@packages/core/lib/banner';

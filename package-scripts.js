@@ -11,7 +11,7 @@ module.exports = {
      * Starts the builded app from the dist directory.
      */
     start: {
-      script: 'cross-env NODE_ENV=production node dist/public/index.js',
+      script: 'cross-env NODE_ENV=production TS_NODE_BASEURL=./dist node -r tsconfig-paths/register dist/public/index.js',
       description: 'Starts the builded app'
     },
     /**
@@ -318,11 +318,11 @@ function copyDir(source, target) {
 }
 
 function run(path) {
-  return `ts-node -r module-alias/register ${path}`;
+  return `ts-node -r tsconfig-paths/register ${path}`;
 }
 
 function runFast(path) {
-  return `ts-node -r module-alias/register -T ${path}`;
+  return `ts-node -r tsconfig-paths/register -T ${path}`;
 }
 
 function tslint(path) {

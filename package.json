@@ -69,7 +69,7 @@
     "jsonfile": "5.0.0",
     "lodash": "^4.17.4",
     "microframework-w3tec": "^0.6.3",
-    "module-alias": "^2.2.2",
+    "tsconfig-paths": "^4.0.0",
     "moment": "^2.29.1",
     "morgan": "^1.9.0",
     "nodemon": "^1.12.1",
@@ -154,9 +154,5 @@
     "swagger-ui-express": "4.0.1"
   },
   "commentDevDependencies": {},
-  "_moduleAliases": {
-    "@": "./",
-    "@packages": "./packages",
-    "@app": "./app"
-  }
+  "comment": {}
 }
