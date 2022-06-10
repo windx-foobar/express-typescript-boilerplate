@@ -42,27 +42,18 @@ module.exports = {
       description: 'Setup`s the development environment(yarn & database)'
     },
     /**
-     * Creates the needed configuration files
-     */
-    config: {
-      script: series(
-        runFast('./packages/core/commands/tsconfig.ts')
-      ),
-      hiddenFromHelp: true
-    },
-    /**
      * Builds the app into the dist directory
      */
     build: {
-      script: series(
-        'nps banner.build',
-        'nps config',
-        'nps lint',
-        'nps clean.dist',
-        'nps transpile',
-        'nps copy',
-        'nps copy.tmp',
-        'nps clean.tmp'
+      script: series.nps(
+        'banner.build',
+        'make.tsconfig',
+        'lint',
+        'clean.dist',
+        'transpile',
+        'copy',
+        'copy.tmp',
+        'clean.tmp'
       ),
       description: 'Builds the app into the dist directory'
     },
@@ -138,26 +129,54 @@ module.exports = {
      */
     db: {
       migrate: {
-        script: series(
-          'nps banner.migrate',
-          runFast('./packages/core/commands/db.migrate.ts')
-        ),
-        description: 'Migrates the database to newest version available'
+        default: {
+          script: series(
+            'nps banner.migrate',
+            runFast('./packages/core/commands/db.migrate.ts')
+          ),
+          description: 'Выполнение миграций, которые еще не выполнены'
+        },
+        verbose: {
+          script: series(
+            'nps banner.migrate',
+            runFast('./packages/core/commands/db.migrate.ts') + ' --verbose'
+          ),
+          description: 'Выполнение миграций, которые еще не выполнены (verbose mode)'
+        }
       },
       revert: {
-        script: series(
-          'nps banner.revert',
-          runFast('./packages/core/commands/db.revert.ts')
-        ),
-        description: 'Downgrades the database'
+        default: {
+          script: series(
+            'nps banner.revert',
+            runFast('./packages/core/commands/db.revert.ts')
+          ),
+          description: 'Откат миграций'
+        },
+        verbose: {
+          script: series(
+            'nps banner.revert',
+            runFast('./packages/core/commands/db.revert.ts') + ' --verbose'
+          ),
+          description: 'Откат миграций (verbose mode)'
+        }
       },
       fresh: {
-        script: series(
-          'nps banner.fresh',
-          'nps db.revert',
-          'nps db.migrate'
-        ),
-        description: 'Downgrades the database'
+        default: {
+          script: series(
+            'nps banner.fresh',
+            runFast('./packages/core/commands/db.revert.ts'),
+            runFast('./packages/core/commands/db.migrate.ts')
+          ),
+          description: 'Откат и миграция базы данных'
+        },
+        verbose: {
+          script: series(
+            'nps banner.fresh',
+            runFast('./packages/core/commands/db.revert.ts') + ' --verbose',
+            runFast('./packages/core/commands/db.migrate.ts') + ' --verbose'
+          ),
+          description: 'Откат и миграция базы данных (verbose mode)'
+        }
       },
       seed: {
         default: {
@@ -165,22 +184,38 @@ module.exports = {
             'nps banner.seed',
             runFast(`./packages/core/commands/db.seed.ts`)
           ),
-          description: 'Seeds generated records into the database'
+          description: 'Заполнить базу инструкциями из сидера'
+        },
+        verbose: {
+          script: series(
+            'nps banner.seed',
+            runFast(`./packages/core/commands/db.seed.ts`) + ' --verbose'
+          ),
+          description: 'Заполнить базу инструкциями из сидера (verbose)'
         }
       },
       setup: {
-        script: series(
-          'nps db.fresh',
-          'nps db.seed'
-        ),
-        description: 'Recreates the database with seeded data'
+        default: {
+          script: series.nps(
+            'db.fresh',
+            'db.seed'
+          ),
+          description: 'Пересоздать базу данных с заполненными данными'
+        },
+        verbose: {
+          script: series.nps(
+            'db.fresh.verbose',
+            'db.seed.verbose'
+          ),
+          description: 'Пересоздать базу данных с заполненными данными (verbose mode)'
+        }
       }
     },
     /**
      * These run various kinds of tests. Default is unit.
      */
     test: {
-      default: 'nps test.unit test.integration test.e2e',
+      default: series.nps('test.unit', 'test.integration', 'test.e2e'),
       unit: {
         default: {
           script: series(
@@ -264,20 +299,51 @@ module.exports = {
     },
     make: {
       migration: {
-        script: series(
-          'nps banner.makeMigration',
-          runFast(`./packages/core/commands/make.migration.ts`)
-        ),
-        // TODO: Перевести на инглиш
-        description: 'Генерация файла миграции'
+        default: {
+          script: series(
+            'nps banner.makeMigration',
+            runFast(`./packages/core/commands/make.migration.ts`)
+          ),
+          description: 'Генерация файла миграции'
+        },
+        verbose: {
+          script: series(
+            'nps banner.makeMigration',
+            runFast(`./packages/core/commands/make.migration.ts`) + ' --verbose'
+          ),
+          description: 'Генерация файла миграции (verbose mode)'
+        }
       },
       seed: {
-        script: series(
-          'nps banner.makeSeed',
-          runFast(`./packages/core/commands/make.seed.ts`)
-        ),
-        // TODO: Перевести на инглиш
-        description: 'Генерация файла сидера'
+        default: {
+          script: series(
+            'nps banner.makeSeed',
+            runFast(`./packages/core/commands/make.seed.ts`)
+          ),
+          description: 'Генерация файла сидера'
+        },
+        verbose: {
+          script: series(
+            'nps banner.makeSeed',
+            runFast(`./packages/core/commands/make.seed.ts`) + ' --verbose'
+          ),
+          description: 'Генерация файла сидера (verbose mode)'
+        }
+      },
+      /**
+       * Creates the needed configuration files
+       */
+      tsconfig: {
+        default: {
+          script: runFast(`./packages/core/commands/make.tsconfig.ts`),
+          description: 'Генерация файла tsconfig.build.json',
+          hiddenFromHelp: true
+        },
+        verbose: {
+          script: runFast(`./packages/core/commands/make.tsconfig.ts`) + ' --verbose',
+          description: 'Генерация файла tsconfig.build.json (verbose mode)',
+          hiddenFromHelp: true
+        }
       }
     },
     /**
