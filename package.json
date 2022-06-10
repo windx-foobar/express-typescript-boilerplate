@@ -1,6 +1,6 @@
 {
   "name": "express-typescript-wxplate",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A delightful way to building a Node.js RESTful API Services with beautiful code written in TypeScript",
   "main": "public/index.ts",
   "scripts": {
@@ -15,7 +15,7 @@
     "test:single": "cross-env NODE_ENV=test jest",
     "build": "npm start build",
     "presetup": "yarn install",
-    "setup": "npm start config && npm start setup.script"
+    "setup": "npm start make.tsconfig && npm start setup"
   },
   "engines": {
     "node": ">= 14"
