@@ -8,3 +8,4 @@ export type AnyFunction = (...args: any[]) => any;
 export const glob = promisify(_glob);
 export const exec = promisify(_exec);
 export const spawn = promisify(_spawn);
+export const spawnWithEvents = _spawn;
