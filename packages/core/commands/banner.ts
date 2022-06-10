@@ -1,12 +1,23 @@
 import chalk from 'chalk';
 import * as figlet from 'figlet';
 
-figlet.text(process.argv[2], (error: any, data: any) => {
-  if (error) {
-    return process.exit(1);
+import { Command } from '@packages/cli';
+
+export class BannerCommand extends Command {
+  protected async handle(options: any, ...args): Promise<void> {
+    figlet.text(args[0], (error: any, data: any) => {
+      if (error) {
+        return this.externalLog('Figlet', 'red', error);
+      }
+
+      return this.success(data);
+    });
   }
 
-  console.log(chalk.blue(data));
-  console.log('');
-  return process.exit(0);
-});
+  protected success(...args) {
+    this.$transport(chalk.blue(args[0]));
+    this.$transport('');
+  }
+}
+
+new BannerCommand().start();

@@ -1,31 +1,76 @@
-import chalk from 'chalk';
-import { config } from '../config';
-import { exec } from '../utils';
+import { spawnWithEvents } from '@packages/core/utils';
+import { config } from '@packages/core/config';
 
-async function run() {
-  const log = console.log;
+import { DbCommand } from './abstracts/db';
 
-  const { host, port, username, password, type, database } = config.db;
+export class DbMigrateCommand extends DbCommand {
+  constructor() {
+    super();
 
-  const connectionString = `${type}://${username}:${password}@${host}:${port}/${database}`;
+    this.registerOption(
+      '--migrations-path <path>',
+      'Директория с миграциями',
+      config.app.dirs.migrationsDir
+    );
+  }
 
-  try {
-    const { stdout, stderr } = await exec([
-      'ts-node -T',
-      './node_modules/sequelize-cli/lib/sequelize',
+  protected get name() {
+    return 'db.migrate';
+  }
+
+  protected get description() {
+    return 'Запуск миграций базы данных';
+  }
+
+  protected async handle(options: any): Promise<any> {
+    // 1. Сборка строки для sequelize-cli
+    const connectionString = this.stepConnectionString(options);
+
+    // 2. Выполнение команды sequelize-cli (db:migrate)
+    await this.stepHandleSequelizeCommand(connectionString, options);
+  }
+
+  private async stepHandleSequelizeCommand(connectionString: string, options: any) {
+    const { migrationsPath } = options;
+
+    if (!migrationsPath) return this.error('Путь до миграций не указан в опциях');
+    if (!connectionString) return this.error('Не собрана строка подключения к базе');
+
+    const commandArgs = [
+      '-T',
+      `${process.cwd()}/node_modules/sequelize-cli/lib/sequelize`,
       'db:migrate',
-      `--migrations-path=${config.app.dirs.migrationsDir}`,
+      `--migrations-path=${migrationsPath}`,
       `--url=${connectionString}`
-    ].join(' '));
+    ];
 
-    if (stderr) throw new Error(stderr);
+    this.log('Запуск команды\n', `\tts-node ${commandArgs.join(' ')}`);
+    const child = await spawnWithEvents('ts-node', commandArgs);
 
-    log('\n👍 Success!', chalk.gray.underline(stdout));
+    child.stdout.on('data', (data: Buffer) => {
+      const logData = data.toString().trim();
 
-    return process.exit(0);
-  } catch (error) {
-    throw error;
+      if (this.filterLogMessageFromSequelize(logData)) {
+        this.externalLog('Sequelize CLI', 'yellow', this.translateFromSequelize(logData));
+      }
+    });
+
+    child.stderr.on('data', (data: Buffer) => {
+      const logData = data.toString().trim();
+
+      if (this.filterLogMessageFromSequelize(logData)) {
+        this.externalLog('Sequelize CLI', 'red', this.translateFromSequelize(logData));
+      }
+    });
+
+    child.on('exit', (code) => {
+      if (+code === 1) {
+        this.error('Команда выполнилась с ошибкой!');
+      } else {
+        this.success('Команда успешно выполнилась!');
+      }
+    });
   }
 }
 
-run();
+new DbMigrateCommand().start();

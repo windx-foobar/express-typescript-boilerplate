@@ -1,49 +1,54 @@
-import fs from 'fs';
-import path from 'path';
 import moment from 'moment';
-import chalk from 'chalk';
-import commander from 'commander';
-import { config } from '../config';
 
-commander
-  .option(
-    '--name <name>',
-    'migration name'
-  )
-  .option(
-    '--migrations-path <path>',
-    'migrations path',
-    config.app.dirs.migrationsDir
-  )
-  .parse(process.argv);
+import { config } from '@packages/core/config';
 
-const absoluteStubsPath = path.resolve(__dirname, './stubs');
-const resolveStubs = (...dirs: string[]) => path.resolve(absoluteStubsPath, ...dirs);
-const resolveMigrations = (...dirs: string[]) => path.resolve(commander.migrationsPath, ...dirs);
+import { MakeCommand } from './abstracts/make';
 
-async function run() {
-  const log = console.log;
+export class MakeMigrationCommand extends MakeCommand {
+  private _outputPath = '';
 
-  try {
-    const migrationName = `${moment().format('YYYYMMDDHHMMSS')}-${commander.name}.ts`;
-    const stubContent = await fs.promises.readFile(resolveStubs('migration.stub'));
-    const migrationPath = resolveMigrations(migrationName);
+  constructor() {
+    super();
 
-    await fs.promises.writeFile(
-      migrationPath,
-      stubContent.toString('utf-8')
+    this.registerOption(
+      '--output-path <path>',
+      'Директория куда сгенерируется миграция',
+      config.app.dirs.migrationsDir
     );
+  }
 
-    const successMessage = `
-      Migration created in ${migrationPath}
-    `;
+  protected get name() {
+    return 'make.migration';
+  }
 
-    log('\n👍 Success!', chalk.gray.underline('\n' + successMessage.trim()));
+  protected get description() {
+    return 'Создание заглушки миграции';
+  }
 
-    return process.exit(0);
-  } catch (error) {
-    throw error;
+  protected get outputPath(): string {
+    return this._outputPath;
+  }
+
+  protected async handle(options: any, fileName: string): Promise<any> {
+    const { outputPath = '' } = options;
+    if (!outputPath) return this.error('Папка, куда сохранять заглушку не указана!');
+    if (!fileName) return this.error('Имя файла не указано аргументом');
+
+    // 1. Папка, в которую сохранится заглушка
+    this._outputPath = outputPath;
+
+    // 2. Сохранение заглушки в директорию
+    const name = `${moment().format('YYYYMMDDHHMMSS')}-${fileName}.ts`;
+
+    this.log('Начало создания файла миграции из заглушки');
+    try {
+      await this.render(name, 'migration');
+      this.success('Команда успешно выполнилась!');
+    } catch (error) {
+      this.log(error);
+      this.error('Команда выполнилась с ошибкой!');
+    }
   }
 }
 
-run();
+new MakeMigrationCommand().start();

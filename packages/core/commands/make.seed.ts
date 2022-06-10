@@ -1,49 +1,55 @@
-import fs from 'fs';
-import path from 'path';
 import moment from 'moment';
-import chalk from 'chalk';
-import commander from 'commander';
-import { config } from '../config';
+import path from 'path';
 
-commander
-  .option(
-    '--name <name>',
-    'seed name'
-  )
-  .option(
-    '--seeders-path <path>',
-    'seeders path',
-    path.resolve(config.app.dirs.migrationsDir, '../seeds')
-  )
-  .parse(process.argv);
+import { config } from '@packages/core/config';
 
-const absoluteStubsPath = path.resolve(__dirname, './stubs');
-const resolveStubs = (...dirs: string[]) => path.resolve(absoluteStubsPath, ...dirs);
-const resolveSeeders = (...dirs: string[]) => path.resolve(commander.seedersPath, ...dirs);
+import { MakeCommand } from './abstracts/make';
 
-async function run() {
-  const log = console.log;
+export class MakeSeedCommand extends MakeCommand {
+  private _outputPath = '';
 
-  try {
-    const seedName = `${moment().format('YYYYMMDDHHMMSS')}-${commander.name}.ts`;
-    const stubContent = await fs.promises.readFile(resolveStubs('seed.stub'));
-    const seedPath = resolveSeeders(seedName);
+  constructor() {
+    super();
 
-    await fs.promises.writeFile(
-      seedPath,
-      stubContent.toString('utf-8')
+    this.registerOption(
+      '--output-path <path>',
+      'Директория куда сгенерируется сидер',
+      path.resolve(config.app.dirs.migrationsDir, '../seeds')
     );
+  }
 
-    const successMessage = `
-      Seed created in ${seedPath}
-    `;
+  protected get name() {
+    return 'make.seed';
+  }
 
-    log('\n👍 Success!', chalk.gray.underline('\n' + successMessage.trim()));
+  protected get description() {
+    return 'Создание заглушки сидера';
+  }
 
-    return process.exit(0);
-  } catch (error) {
-    throw error;
+  protected get outputPath(): string {
+    return this._outputPath;
+  }
+
+  protected async handle(options: any, fileName: string): Promise<any> {
+    const { outputPath = '' } = options;
+    if (!outputPath) return this.error('Папка, куда сохранять заглушку не указана!');
+    if (!fileName) return this.error('Имя файла не указано аргументом');
+
+    // 1. Папка, в которую сохранится заглушка
+    this._outputPath = outputPath;
+
+    // 2. Сохранение заглушки в директорию
+    const name = `${moment().format('YYYYMMDDHHMMSS')}-${fileName}.ts`;
+
+    this.log('Начало создания файла сидера из заглушки');
+    try {
+      await this.render(name, 'seed');
+      this.success('Команда успешно выполнилась!');
+    } catch (error) {
+      this.log(error);
+      this.error('Команда выполнилась с ошибкой!');
+    }
   }
 }
 
-run();
+new MakeSeedCommand().start();

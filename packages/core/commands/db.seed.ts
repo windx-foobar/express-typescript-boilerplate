@@ -1,102 +1,123 @@
-import chalk from 'chalk';
 import path from 'path';
-import { exec, glob } from '../utils';
-import commander from 'commander';
-import { config } from '../config';
 
-commander
-  .option(
-    '--seeds <path>',
-    'add filepath for your seeds',
-    path.resolve(config.app.dirs.migrationsDir, '../seeds')
-  )
-  .option(
-    '--run <seeds>',
-    'run specific seeds (file names without extension)',
-    (val: string[] | any) => val.split(','),
-    ''
-  )
-  .option(
-    '--revert',
-    'run revert seeds'
-  )
-  .option(
-    '--last',
-    'run only last seed'
-  )
-  .parse(process.argv);
+import { spawnWithEvents, glob } from '@packages/core/utils';
+import { config } from '@packages/core/config';
 
-async function makeSeedsNames(): Promise<string> {
-  let seeds: any[];
+import { DbCommand } from './abstracts/db';
 
-  if (!commander.run) {
-    seeds = await glob(path.resolve(config.app.dirs.migrationsDir, '../seeds/*.ts'));
-    seeds = seeds.map((seed) => seed.split('/').slice(-1).join(''));
+export class DbSeedCommand extends DbCommand {
+  constructor() {
+    super();
 
-    if (commander.last) {
-      seeds = seeds.slice(-1);
-    }
-  } else {
-    seeds = commander?.run ?? [];
+    this.registerOption(
+      '--seeds-path <path>',
+      'Директория с сидерами',
+      path.resolve(config.app.dirs.migrationsDir, '../seeds')
+    )
+      .registerOption(
+        '--last',
+        'Опция, чтобы запустить только последний сидер'
+      );
   }
 
-  if (Array.isArray(seeds)) {
-    return seeds.map((name: string) => `--seed=${name}`).join(' ');
+  protected get name() {
+    return 'db.seed';
   }
 
-  return '';
-}
-
-function makeCommandName(
-  names: string,
-  revert: boolean
-): 'db:seed' | 'db:seed:all' | 'db:seed:undo' | 'db:seed:undo:all' {
-  const all = !names.length;
-
-  if (all) {
-    if (revert) return 'db:seed:undo:all';
-
-    return 'db:seed:all';
-  } else {
-    if (revert) return 'db:seed:undo';
-
-    return 'db:seed';
+  protected get description() {
+    return 'Заполнение таблиц данными';
   }
-}
 
-async function run() {
-  const log = console.log;
+  protected get lang() {
+    return {
+      ...super.lang,
+      migrating: 'выполнение сидера'
+    };
+  }
 
-  const { host, port, username, password, type, database } = config.db;
+  protected async handle(options: any, ...args: string[]): Promise<any> {
+    // 1. Сборка строки для sequelize-cli
+    const connectionString = this.stepConnectionString(options);
 
-  const connectionString = `${type}://${username}:${password}@${host}:${port}/${database}`;
+    // 2. Сборка файлов сидеров
+    const seedNames = await this.makeSeedNamesOption(options, args);
+    if (!Array.isArray(seedNames)) return;
 
-  try {
-    if (commander.run && commander.last) {
-      log('\n👎 Error!\n', chalk.red('Опции --run и --last не могут быть переданы вместе\n\n'));
-      return process.exit(1);
-    }
+    // 3. Выполнение команды sequelize-cli (db:seed | db:seed:all)
+    await this.stepHandleSequelizeCommand(connectionString, options, seedNames);
+  }
 
-    const seedsNames = await makeSeedsNames();
-    const commandName = makeCommandName(seedsNames, !!commander.revert);
+  private async stepHandleSequelizeCommand(
+    connectionString: string,
+    options: any,
+    seedNames: string[]
+  ) {
+    const { seedsPath } = options;
 
-    const { stdout, stderr } = await exec([
-      'ts-node -T',
-      './node_modules/sequelize-cli/lib/sequelize',
-      commandName,
-      `--seeders-path=${commander.seeds}`,
+    if (!seedsPath) return this.error('Путь до миграций не указан в опциях');
+    if (!connectionString) return this.error('Не собрана строка подключения к базе');
+
+    const commandArgs = [
+      '-T',
+      `${process.cwd()}/node_modules/sequelize-cli/lib/sequelize`,
+      'db:seed',
+      `--seeders-path=${seedsPath}`,
       `--url=${connectionString}`,
-      seedsNames
-    ].join(' '));
+      ...(seedNames.length ? seedNames : [])
+    ];
 
-    if (stderr) throw new Error(stderr);
+    this.log('Запуск команды\n', `\tts-node ${commandArgs.join(' ')}`);
+    const child = await spawnWithEvents('ts-node', commandArgs);
 
-    log('\n👍 Success!', chalk.gray.underline(stdout));
+    child.stdout.on('data', (data: Buffer) => {
+      const logData = data.toString().trim();
 
-    return process.exit(0);
-  } catch (error) {
-    throw error;
+      if (this.filterLogMessageFromSequelize(logData)) {
+        this.externalLog('Sequelize CLI', 'yellow', this.translateFromSequelize(logData));
+      }
+    });
+
+    child.stderr.on('data', (data: Buffer) => {
+      const logData = data.toString().trim();
+
+      if (this.filterLogMessageFromSequelize(logData)) {
+        this.externalLog('Sequelize CLI', 'red', this.translateFromSequelize(logData));
+      }
+    });
+
+    child.on('exit', (code) => {
+      if (+code === 1) {
+        this.error('Команда выполнилась с ошибкой!');
+      } else {
+        this.success('Команда успешно выполнилась!');
+      }
+    });
+  }
+
+  private async makeSeedNamesOption(options: any, names: string[]) {
+    const { seedsPath = '', last = false } = options;
+    if (!seedsPath) return this.error('Путь до сидеров не указан в опциях');
+
+    let seeds: any[];
+
+    if (!names.length) {
+      seeds = await glob(path.resolve(seedsPath, '../seeds/*.ts'));
+      seeds = seeds.map((seed) => seed.split('.')[0]);
+      seeds = seeds.map((seed) => seed.split('/').slice(-1).join(''));
+
+      if (last) {
+        seeds = seeds.slice(-1);
+      }
+    } else {
+      seeds = names;
+    }
+
+    if (Array.isArray(seeds)) {
+      return seeds.map((name: string) => `--seed=${name}`);
+    }
+
+    return [];
   }
 }
 
-run();
+new DbSeedCommand().start();

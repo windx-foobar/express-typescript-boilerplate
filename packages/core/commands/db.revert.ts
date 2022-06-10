@@ -1,31 +1,83 @@
-import chalk from 'chalk';
-import { exec } from '../utils';
-import { config } from '../config';
+import { spawnWithEvents } from '@packages/core/utils';
+import { config } from '@packages/core/config';
 
-async function run() {
-  const log = console.log;
+import { DbCommand } from './abstracts/db';
 
-  const { host, port, username, password, type, database } = config.db;
+export class DbRevertCommand extends DbCommand {
+  constructor() {
+    super();
 
-  const connectionString = `${type}://${username}:${password}@${host}:${port}/${database}`;
+    this.registerOption(
+      '--migrations-path <path>',
+      'Директория с миграциями',
+      config.app.dirs.migrationsDir
+    )
+      .registerOption(
+        '--to <name>',
+        'До какой миграции откатить',
+        ''
+      );
+  }
 
-  try {
-    const { stdout, stderr } = await exec([
-      'ts-node -T',
-      './node_modules/sequelize-cli/lib/sequelize',
+  protected get name() {
+    return 'db.revert';
+  }
+
+  protected get description() {
+    return 'Откат миграций базы данных';
+  }
+
+  protected async handle(options: any): Promise<any> {
+    // 1. Сборка строки для sequelize-cli
+    const connectionString = this.stepConnectionString(options);
+
+    // 2. Выполнение команды sequelize-cli (db:migrate:undo:all)
+    await this.stepHandleSequelizeCommand(connectionString, options);
+  }
+
+  private async stepHandleSequelizeCommand(connectionString: string, options: any) {
+    const { migrationsPath, to = '' } = options;
+
+    if (!migrationsPath) return this.error('Путь до миграций не указан в опциях');
+    if (!connectionString) return this.error('Не собрана строка подключения к базе');
+
+    const commandArgs = [
+      '-T',
+      `${process.cwd()}/node_modules/sequelize-cli/lib/sequelize`,
       'db:migrate:undo:all',
-      `--migrations-path=${config.app.dirs.migrationsDir}`,
+      `--migrations-path=${migrationsPath}`,
       `--url=${connectionString}`
-    ].join(' '));
+    ];
 
-    if (stderr) throw new Error(stderr);
+    if (to?.trim()?.length) commandArgs.push(`--to=${to}`);
 
-    log('\n👍 Success!', chalk.gray.underline(stdout));
+    this.log('Запуск команды\n', `\tts-node ${commandArgs.join(' ')}`);
+    const child = await spawnWithEvents('ts-node', commandArgs);
 
-    return process.exit(0);
-  } catch (error) {
-    throw error;
+    child.stdout.on('data', (data: Buffer) => {
+      const logData = data.toString().trim();
+
+      if (this.filterLogMessageFromSequelize(logData)) {
+        this.externalLog('Sequelize CLI', 'yellow', this.translateFromSequelize(logData));
+      }
+    });
+
+    child.stderr.on('data', (data: Buffer) => {
+      const logData = data.toString().trim();
+
+      if (this.filterLogMessageFromSequelize(logData)) {
+        this.externalLog('Sequelize CLI', 'red', this.translateFromSequelize(logData));
+      }
+    });
+
+    child.on('exit', (code) => {
+      if (+code === 1) {
+        this.error('Команда выполнилась с ошибкой!');
+      } else {
+        this.success('Команда успешно выполнилась!');
+      }
+    });
   }
 }
 
-run();
+new DbRevertCommand().start();
