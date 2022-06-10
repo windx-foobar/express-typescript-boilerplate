@@ -62,9 +62,11 @@
 - [Доступные CLI скрипты](#-доступные-cli-скрипты)
 - [Маршруты API (routes)](#-маршруты-api)
 - [Структура проекта](#-структура-проекта)
+- [Миграции базы данных (migrations)](#-миграции-базы-данных)
+- [Заполнение базы данными (seeding)](#-заполнение-базы-данными)
+- [Примеры сидинга и миграций](#-примеры-сидинга-и-миграций)
 - [Логирование (logging)](#-логирование)
 - [Вызов события (event dispatching)](#-вызов-события)
-- [Заполнение базы данными (seeding)](#-заполнение-базы-данными)
 - [Дополнительная документация](#-дополнительная-документация)
 - [Связанные проекты](#-связанные-проекты)
 - [Лицензия](#-лицензия)
@@ -117,7 +119,11 @@ yarn setup
 Перейдите в директорию проекта, если вы не в ней, и запустите приложение в DEV режиме, используя yarn скрипт.
 
 ```bash
-yarn start serve
+# unix
+./bin/console serve
+
+# windows
+yarn start 'serve' # (кавычки обязательны)
 ```
 
 > Данный скрипт запустит локальный сервер, используя `nodemon`, который будет следить за измениями файлов приложения и перезапускать сервер.
@@ -129,7 +135,14 @@ yarn start serve
 ## ❯ Доступные CLI скрипты
 
 Все скрипты определены в файле `package-scripts.js`, но самые важные описаны здесь.   
-Так же все доступные скрипты можно увидеть, набрав `yarn nps help`
+Так же все доступные скрипты можно увидеть, набрав
+```bash
+# unix
+./bin/console help
+
+# windows
+yarn nps help
+```
 
 ### Установка
 
@@ -137,48 +150,311 @@ yarn start serve
 
 ### Анализ качества кода (Linting)
 
-- Для запуска анализа качества кода используйте команду `yarn start lint`. Она запустит tslint.
+- Для запуска анализа качества кода используйте команду. Она запустит tslint.
+```bash
+# unix
+./bin/console lint
+
+# windows
+yarn start 'lint' # (кавычки обязательны)
+```
+
 - Для этого так же существует задача в JetBrains `lint`.
 
 ### Тестирование
 
-- Для запуска unit тестов, используйте `yarn start test.unit`.
-- Для запуска integration тестов, используйте `yarn start test.integration`.
-- Для запуска e2e тестов, используйте `yarn start test.e2e`.
-- Для запуска полного тестирования, используйте `yarn start test`
-  (Так же можно запустить, используя JetBrains задачу `test`).
+- Для запуска unit тестов, используйте
+```bash
+# unix
+./bin/console test.unit
+
+# windows
+yarn start 'test.unit' # (кавычки обязательны)
+```
+- Для запуска integration тестов, используйте
+```bash
+# unix
+./bin/console test.integration
+
+# windows
+yarn start 'test.integration' # (кавычки обязательны)
+```
+- Для запуска e2e тестов, используйте
+```bash
+# unix
+./bin/console test.e2e
+
+# windows
+yarn start 'test.e2e' # (кавычки обязательны)
+```
+- Для запуска полного тестирования, используйте
+```bash
+# unix
+./bin/console test
+
+# windows
+yarn start 'test' # (кавычки обязательны)
+```
+(Так же можно запустить, используя JetBrains задачу `test`).
 
 ### Запуск в режиме разработчика (development)
+```bash
+# unix
+./bin/console serve
 
-- Запустите команду `yarn start serve` для запуска nodemon, который будет использовать ts-node, для работы вашего приложения.
-- В консоли вы увидите `http://{APP_HOST}:{APP_PORT}`. Это хост и порт, на котором запущено приложение.
+# windows
+yarn start 'serve' # (кавычки обязательны)
+```
+
+> Команда запустит nodemon, который будет использовать ts-node, для работы вашего приложения.   
+> После успешного старта в консоли вы увидите информацию. Она содержит `http://{APP_HOST}:{APP_PORT}`. Это хост и порт, на котором запущено приложение. 
 
 ### Сборка приложения и запуск в боевом (production) режиме
 
-- Запустите команду `yarn start build`, которая запустит транспиляцую всех TypeScript исходников в JavaScript код
-  (Так же можно запустить, используя JetBrains задачу `build`).
-- После транспиляции приложения и появления папки `dist`, используйте `yarn start`.
+```bash
+# unix
+./bin/console build # запуск транспиляции TypeScript в JavaScript
+./bin/console start # запуск сервера из папки <projectDir>/dist
 
-> Несколько слов о production режиме.
+# windows
+yarn start 'build' # запуск транспиляции TypeScript в JavaScript (кавычки обязательны)
+yarn start # запуск сервера из папки <projectDir>/dist
+```
+
+> Несколько слов о production режиме.   
+> Запускать production сервер следует только после сборки и появления папки dist в корне проекта.   
 > Когда вы собрали и запустили приложение командой `yarn start`, логгирование в терминале не происходит.
 > Это нормальное поведение. Боевой режим логгируется в файлах, которые автоматически создаются в директории logs.
 > Их можно просматривать утилитой `tail` набрав `tail -f <projectDir>/logs/production-log-XXXX-XX-XX.log`(bash|sh|zsh) или аналогичным инструментом в других системах.
 
-### Миграции базы данных (migrations)
+## > Миграции базы данных
 
-- Для создания миграции используйте `yarn start "make.migration --name <migration-file-name>"` (обратите внимание на кавычки, они обязательны!).
-- Для запуска миграций используйте `yarn start db.migrate`. Данный скрипт запустит миграции, которые еще не были запущены.
-- Для отката миграций есть несколько вариантов
-  1. `yarn start "db.revert --all"` (обратите внимание на кавычки, они обязательны!) откатит все миграции без исключения
-  2. `yarn start db.revert` откатит только последние миграции
-- Для того чтобы откатить все и заполнить снова (fresh) используйте `yarn start db.fresh`.
+Как же утомительно определять структуру таблицы, используя СУБД...
 
-### Заполнение базы данных (seeding)
+Как это работает? Просто создайте migration файл с инструкцией по определению схемы таблицы.
 
-- Используйте команду `yarn start db.seed` для заполнения базы данных инструкциями ***всех*** сидеров.
-- Используйте команду `yarn start "db.seed --last"` (обратите внимание на кавычки, они обязательны!) для заполнения базы данных инструкциями ***последнего*** сидеров.
-- Используйте команду `yarn start "db.seed --run <file1WithoutExt>,<file2WithoutExt>,<...other>"` (обратите внимание на кавычки, они обязательны!) для заполнения базы данных инструкциями ***
-  указанных*** сидеров.
+### 1. Создание миграции
+
+Файлы миграций определяют схемы таблиц (колонки, типы данных, связи и т.д.).
+
+```bash
+# unix
+./bin/console make.migration <migration-name> # создание файла миграции
+# ./bin/console make.migration.verbose <migration-name> # запуск команды с детальным логированием
+# ./bin/console make.migration --help # узнать доступные опции команды
+
+# windows
+yarn start 'make.migration <migration-name>' # создание файла миграции (кавычки обязательны)
+# yarn start 'make.migration.verbose <migration-name>' # запуск команды с детальным логированием (кавычки обязательны)
+# yarn start 'make.migration --help' # узнать доступные опции команды (кавычки обязательны)
+```
+
+> Совет:   
+> Не создавайте файлы миграций вручную, используйте консольную команду `make.migration <migration-name>`   
+> Это поможет избежать лишних проблем и сэкономит время
+
+```typescript
+// 20220510161938-CreateTable
+
+import { QueryInterface, DataTypes } from 'sequelize';
+
+export default {
+  async up(queryInterface: QueryInterface) {
+    /**
+     * Определяйте схему таблицы здесь
+     * @see https://sequelize.org/docs/v6/other-topics/migrations/#migration-skeleton
+     */
+    
+    return queryInterface.createTable('table', {
+      name: DataTypes.STRING,
+      isBetaMember: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      }
+    });
+  },
+  
+  async down(queryInterface: QueryInterface) {
+    /**
+     * Определяйте инструкции отката схемы таблицы здесь
+     * @see https://sequelize.org/docs/v6/other-topics/migrations/#migration-skeleton
+     */
+    
+    return queryInterface.dropTable('table');
+  }
+}
+```
+
+Безусловно, нужно понимать как работает queryInterface из пакета sequelize.
+
+### 2. Запуск миграций
+
+Файлы будут выполнены по префиксу времени создания (от меньшего к большому).   
+- 2020MMDDHHMMSS-XXXTable.ts - выполнится первой
+- 2021MMDDHHMMSS-XXXTable.ts - выполнится второй
+- 2022MMDDHHMMSS-XXXTable.ts - выполнится третьей
+
+```bash
+# unix
+./bin/console db.migrate # запуск миграций, которые еще не были запущены
+# ./bin/console db.migrate.verbose # запуск команды с детальным логированием
+# ./bin/console db.migrate --help # узнать доступные опции команды
+
+# windows
+yarn start 'db.migrate' # запуск миграций, которые еще не были запущены (кавычки обязательны)
+# yarn start 'db.migrate.verbose' # запуск команды с детальным логированием (кавычки обязательны)
+# yarn start 'db.migrate --help' # узнать доступные опции команды (кавычки обязательны)
+```
+
+### 3. Откат миграций
+```bash
+# unix
+./bin/console db.revert [--to <migration-name with datetime>] # откат всех миграций. если указан опция --to, то откат произойдет до этой миграции, включая ее
+# ./bin/console db.revert.verbose [--to <migration-name with datetime>] # запуск команды с детальным логированием
+# ./bin/console db.revert --help # узнать доступные опции команды
+
+# windows
+yarn start 'db.revert [--to <migration-name with datetime>]' # откат всех миграций. если указан опция --to, то откат произойдет до этой миграции, включая ее (кавычки обязательны)
+# yarn start 'db.revert.verbose [--to <migration-name with datetime>]' # запуск команды с детальным логированием (кавычки обязательны)
+# yarn start 'db.revert --help' # узнать доступные опции команды (кавычки обязательны)
+```
+
+### 4. "Свежая база"
+
+Логика данной команды подразумевает последовательное выполнение `db.revert` и `db.migrate`
+```bash
+# unix
+./bin/console db.fresh # освежение базы данных
+# ./bin/console db.fresh.verbose # запуск команды с детальным логированием
+# ./bin/console db.fresh --help # узнать доступные опции команды
+
+# windows
+yarn start 'db.fresh' # освежение базы данных (кавычки обязательны)
+# yarn start 'db.fresh.verbose' # запуск команды с детальным логированием (кавычки обязательны)
+# yarn start 'db.fresh --help' # узнать доступные опции команды (кавычки обязательны)
+```
+
+![divider](./windx-divider.png)
+
+## ❯ Заполнение базы данными
+
+Как же утомительно заполнять данными таблицы в базе...
+
+Как это работает? Просто создайте seed файл с инструкциями по заполнению.
+
+### 1. Создание seed файла
+
+Сид файлы определяют чем заполнять ваши таблицы, и какие таблицы заполнять.
+Файлы будут выполнены по времени создания (от меньшего к большому), если вы запустили скрипт
+без опций, но об этом ниже:)
+
+```bash
+# unix
+./bin/console make.seed <seed-name> # создание файла сидера
+# ./bin/console make.seed.verbose <seed-name> # запуск команды с детальным логированием
+# ./bin/console make.seed --help # узнать доступные опции команды
+
+# windows
+yarn start 'make.seed <seed-name>' # создание файла сидера (кавычки обязательны)
+# yarn start 'make.seed.verbose <seed-name>' # запуск команды с детальным логированием (кавычки обязательны)
+# yarn start 'make.seed --help' # узнать доступные опции команды (кавычки обязательны)
+```
+
+> Совет:   
+> Не создавайте файлы сидеров вручную, используйте консольную команду `make.seed <seed-name>`   
+> Это поможет избежать лишних проблем и сэкономит время
+
+```typescript
+// 20220510161938-FillTable
+
+import { QueryInterface } from 'sequelize';
+
+export default {
+  async up(queryInterface: QueryInterface) {
+    /**
+     * Вводите код сидера сюда
+     * @see https://sequelize.org/docs/v6/other-topics/migrations/#creating-the-first-seed
+     */
+    
+    const records = [
+      { name: 'foo', created_at: new Date(), updated_at: new Date() },
+      { name: 'bar', created_at: new Date(), updated_at: new Date() },
+      { name: 'baz', created_at: new Date(), updated_at: new Date() },
+    ];
+    
+    return queryInterface.bulkInsert('table', records);
+  }
+}
+```
+
+Безусловно, нужно понимать как работает queryInterface из пакета sequelize.
+
+### 2. Запуск сидера(-ов)
+
+Если не определять аргументом имена сидеров, которые должны выполнится, то выполнятся все.   
+Сидеры будут выполнены по префиксу времени создания (от меньшего к большому).   
+- 2020MMDDHHMMSS-XXXTable.ts - выполнится первым
+- 2021MMDDHHMMSS-XXXTable.ts - выполнится вторым
+- 2022MMDDHHMMSS-XXXTable.ts - выполнится третим
+
+```bash
+# unix
+./bin/console db.seed # запуск всех сидеров
+./bin/console db.seed <seed-name with datetime ...> # запуск только указанных сидеров
+./bin/console db.seed --last # запуск только последнего сидера
+# ./bin/console db.seed.verbose [--last] [<seed-name with datetime ...>] # запуск команды с детальным логированием
+# ./bin/console db.seed --help # узнать доступные опции команды
+
+# windows
+yarn start 'db.seed' # запуск всех сидеров (кавычки обязательны)
+yarn start 'db.seed <seed-name with datetime ...>' # запуск только указанных сидеров (кавычки обязательны)
+yarn start 'db.seed --last' # запуск только последнего сидера (кавычки обязательны)
+# yarn start 'db.seed.verbose [--last] [<seed-name with datetime ...>]' # запуск команды с детальным логированием (кавычки обязательны)
+# yarn start 'db.seed --help' # узнать доступные опции команды (кавычки обязательны)
+```
+
+![divider](./windx-divider.png)
+
+## > Примеры сидинга и миграций
+
+### Поэтапный пример миграции
+
+#### Создание и выполнение миграции CreateSimpleTable
+
+```bash
+# unix
+./bin/console make.migration CreateSimpleTable # создание файла
+./bin/console db.migrate # выполнение миграций
+
+# windows
+yarn start 'make.migration CreateSimpleTable' # создание файла (кавычки обязательны)
+yarn start 'db.migrate' # выполнение миграций (кавычки обязательны)
+```
+
+#### Откат миграции CreateSimpleTable
+
+```bash
+# unix
+./bin/console db.revert --to YYYYMMDDHHMMSS-CreateSimpleTable # откат всех миграций до CreateSimpleTable
+
+# windows
+yarn start 'db.revert --to YYYYMMDDHHMMSS-CreateSimpleTable' # откат всех миграций до CreateSimpleTable (кавычки обязательны)
+```
+
+### Поэтапный пример сидинга
+
+```bash
+# unix
+./bin/console make.seed FillSimpleTable # создание файла
+./bin/console make.seed FillSimpleTable # создание файла (да-да, сидер может называться одинаково)
+./bin/console db.seed YYYYMMDDHHMMSS-FillSimpleTable YYYYMMDDHHMMSS-FillSimpleTable # выполнение сидеров
+
+# windows
+yarn start 'make.seed FillSimpleTable' # создание файла (кавычки обязательны)
+yarn start 'make.seed FillSimpleTable' # создание файла (кавычки обязательны)
+yarn start 'db.seed YYYYMMDDHHMMSS-FillSimpleTable YYYYMMDDHHMMSS-FillSimpleTable' # выполнение сидеров (кавычки обязательны)
+```
 
 ![divider](./windx-divider.png)
 
@@ -281,65 +557,6 @@ export class UserService {
 
 ![divider](./windx-divider.png)
 
-## ❯ Заполнение базы данными
-
-Как же утомительно заполнять данными таблицы в базе...
-
-Как это работает? Просто создайте seed файл с инструкциями по заполнению.
-
-### 1. Создание seed файла
-
-Сид файлы определяют чем заполнять ваши таблицы, и какие таблицы заполнять.
-Файлы будут выполнены по времени создания (от меньшего к большому), если вы запустили скрипт
-без опций, но об этом ниже:)
-
-> Совет:   
-> Не создавайте файлы сидеров вручную, используйте консольную команду `yarn start "make.seed --name <SeedName>"`   
-> Это поможет избежать лишних проблем и сэкономит время
-
-```typescript
-// 20220510161938-FillTable
-
-import { QueryInterface } from 'sequelize';
-
-export default {
-  async up(queryInterface: QueryInterface) {
-    /**
-     * Вводите код сидера сюда
-     * @see https://sequelize.org/docs/v6/other-topics/migrations/#creating-the-first-seed
-     */
-    
-    const records = [
-      { name: 'foo', created_at: new Date(), updated_at: new Date() },
-      { name: 'bar', created_at: new Date(), updated_at: new Date() },
-      { name: 'baz', created_at: new Date(), updated_at: new Date() },
-    ];
-    
-    return queryInterface.bulkInsert('table', records);
-  }
-}
-```
-
-Безусловно, нужно понимать как работает queryInterface из пакета sequelize.
-
-### 2. Запуск сидера
-
-Последний шаг - запуск сидеров из папки seeds.
-
-```bash
-yarn start db.seed
-```
-
-#### CLI Команды
-
-| Команда                                                                               | Описание    |
-| ------------------------------------------------------------------------------------- | ----------- |
-| `yarn start "db.seed"`                                                                | Запустит все сидеры из папки seeds |
-| `yarn start "db.seed --run 20220510161938-FillTableFoo,20220510201938-FillTableBar"`  | Запустит указанные сидеры (наименование файлов нужно указывать через запятую, с меткой времени, но без расширения) |
-| `yarn start "db.seed --seeds <path>"`                                                 | Переопределить папку с сидерами (По умолчанию: `<projectRoot>/database/seeds/`) |
-
-![divider](./windx-divider.png)
-
 ## ❯ Дополнительная документация
 
 | Name & Link                       | Description                       |
@@ -376,7 +593,3 @@ yarn start db.seed
 ## ❯ Лицензия
 
 [MIT](/LICENSE)
-
-## ❯ TODO
-
-[Список задач](/TODO.md)
