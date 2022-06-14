@@ -4,7 +4,7 @@ import { Sequelize } from 'sequelize-typescript';
 
 import { createDatabaseConnection } from '../../utils/database';
 
-export const sequelizeLoader: MicroframeworkLoader = async (
+export const databaseLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   const connection = await createDatabaseConnection();
