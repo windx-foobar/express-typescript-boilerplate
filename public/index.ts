@@ -8,12 +8,13 @@ import {
   expressLoader,
   iocLoader,
   publicLoader,
-  sequelizeLoader,
+  databaseLoader,
   winstonLoader,
   homeLoader,
   passportLoader,
   eventDispatchLoader
 } from '@packages/core/loaders';
+import { mailerLoader } from '@packages/mailer';
 // import { graphqlLoader } from './loaders/graphqlLoader';
 // import { monitorLoader } from './loaders/monitorLoader';
 // import { swaggerLoader } from './loaders/swaggerLoader';
@@ -36,8 +37,9 @@ bootstrapMicroframework({
   loaders: [
     winstonLoader,
     iocLoader,
+    mailerLoader,
     eventDispatchLoader,
-    sequelizeLoader,
+    databaseLoader,
     passportLoader,
     expressLoader,
     // swaggerLoader,

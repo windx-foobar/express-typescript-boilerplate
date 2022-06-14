@@ -44,7 +44,10 @@ export const config = {
       entitiesDir: getOsPath('SEQUELIZE_ENTITIES_DIR'),
       controllers: getOsPaths('CONTROLLERS'),
       middlewares: getOsPaths('MIDDLEWARES'),
-      subscribers: getOsPaths('SUBSCRIBERS')/*,
+      subscribers: getOsPaths('SUBSCRIBERS'),
+      views: {
+        mailer: getOsPath('MAIL_VIEWS')
+      }/*,
        interceptors: getOsPaths('INTERCEPTORS'),
        resolvers: getOsPaths('RESOLVERS')*/
     }
@@ -63,5 +66,23 @@ export const config = {
     database: getOsEnv('SEQUELIZE_DATABASE')/*,
      synchronize: toBool(getOsEnvOptional('SEQUELIZE_SYNCHRONIZE')),
      logging: toBool(getOsEnv('SEQUELIZE_LOGGING'))*/
+  },
+  mail: {
+    type: getOsEnvOptional('MAIL_MAILER', 'smtp'),
+    viewsExtenstion: getOsEnvOptional('MAIL_VIEWS_EXT', '.tpl'),
+    types: {
+      smtp: {
+        transport: 'smtp',
+        host: getOsEnvOptional('MAIL_HOST'),
+        port: getOsEnvOptional('MAIL_PORT'),
+        username: getOsEnvOptional('MAIL_USERNAME'),
+        password: getOsEnvOptional('MAIL_PASSWORD'),
+        secure: toBool(getOsEnvOptional('MAIL_SECURE', 'false'))
+      },
+      console: {},
+      file: {
+        folder: getOsEnvOptional('MAIL_FOLDER', 'mails')
+      }
+    }
   }
 };

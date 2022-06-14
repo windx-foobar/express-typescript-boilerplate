@@ -1,4 +1,4 @@
-# @w3tec
+# @windx-foobar
 
 # Logs #
 logs/*
@@ -36,3 +36,6 @@ test/**/*.js.map
 coverage/
 !test/preprocessor.js
 mydb.sql
+
+# Mailer #
+mails
