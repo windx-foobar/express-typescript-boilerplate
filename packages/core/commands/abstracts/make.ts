@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { template, TemplateOptions } from 'lodash';
+import Mustache from 'mustache';
 
 import { Command } from '@packages/cli';
 import { config } from '@packages/core/config';
@@ -28,16 +28,16 @@ export abstract class MakeCommand extends Command {
     throw new Error('Must be overwritten in the child class');
   }
 
-  protected async render(fileName: string, stubName: string, options?: TemplateOptions) {
+  protected async render(fileName: string, stubName: string, options?: object) {
     try {
       const stubPath = this.resolveStubs(`${stubName}${this.stubExtension}`);
       const stubContent = await fs.promises.readFile(stubPath);
-      const underscoreTemplate = template(stubContent.toString(), options);
+      const template = Mustache.render(stubContent.toString(), options);
 
       this.log('Запись файла в папку');
       await fs.promises.writeFile(
         this.outputPath + '/' + fileName,
-        underscoreTemplate()
+        template
       );
       this.log('Запись успешно завершена');
     } catch (error) {
