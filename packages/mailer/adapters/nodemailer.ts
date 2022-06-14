@@ -26,7 +26,8 @@ export class NodemailerAdapter implements AdapterInterface {
       return {
         messageId: info.messageId,
         response: info.response,
-        to
+        to,
+        subject
       };
     } catch (error) {
       throw error;
@@ -44,7 +45,8 @@ export class NodemailerAdapter implements AdapterInterface {
       return {
         messageId: info.messageId,
         response: info.response,
-        to
+        to,
+        subject
       };
     } catch (error) {
       throw error;
@@ -68,7 +70,7 @@ export class NodemailerAdapter implements AdapterInterface {
     }
 
     return createTransport(options, {
-      from: `${fromName} <${fromEmail}>`
+      from: `"${fromName}" <${fromEmail}>`
     });
   }
 }

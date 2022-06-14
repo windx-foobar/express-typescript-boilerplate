@@ -2,6 +2,7 @@ interface SentMessageInfo {
   messageId: string | number;
   response: string;
   to: string;
+  subject: string;
 }
 
 export interface AdapterInterface {

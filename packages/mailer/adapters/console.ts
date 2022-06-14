@@ -22,7 +22,8 @@ export class ConsoleAdapter implements AdapterInterface {
     return {
       messageId,
       response: html,
-      to
+      to,
+      subject
     };
   }
 

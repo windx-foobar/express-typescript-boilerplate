@@ -14,7 +14,8 @@ export class MockAdapter implements AdapterInterface {
     return {
       messageId: Date.now(),
       response: html,
-      to
+      to,
+      subject
     };
   }
 
@@ -24,7 +25,8 @@ export class MockAdapter implements AdapterInterface {
     return {
       messageId: Date.now(),
       response: text,
-      to
+      to,
+      subject
     };
   }
 

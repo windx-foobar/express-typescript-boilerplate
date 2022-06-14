@@ -34,7 +34,8 @@ export class FileAdapter implements AdapterInterface {
       return {
         messageId,
         response: content,
-        to
+        to,
+        subject
       };
     } catch (error) {
       throw error;
