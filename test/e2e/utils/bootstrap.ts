@@ -4,14 +4,17 @@ import { bootstrapMicroframework } from 'microframework-w3tec';
 import { Sequelize } from 'sequelize-typescript';
 import { PassportStatic } from 'passport';
 
+import { Mailer } from '@packages/mailer';
 import {
   expressLoader,
   homeLoader,
   iocLoader,
   winstonLoader,
-  passportLoader
+  passportLoader,
+  eventDispatchLoader
 } from '@packages/core/loaders';
-import { sequelizeLoader } from './sequelizeLoader';
+import { databaseLoader } from './databaseLoader';
+import { mailerLoader } from './mailerLoader';
 
 export interface BootstrapSettings {
   app: Application;
@@ -25,8 +28,9 @@ export const bootstrapApp = async (): Promise<BootstrapSettings> => {
     loaders: [
       winstonLoader,
       iocLoader,
-      // eventDispatchLoader,
-      sequelizeLoader,
+      mailerLoader,
+      eventDispatchLoader,
+      databaseLoader,
       passportLoader,
       expressLoader,
       homeLoader
@@ -36,6 +40,7 @@ export const bootstrapApp = async (): Promise<BootstrapSettings> => {
     app: framework.settings.getData('express_app') as Application,
     server: framework.settings.getData('express_server') as Server,
     connection: framework.settings.getData('connection') as Sequelize,
-    passport: framework.settings.getData('passport') as PassportStatic
+    passport: framework.settings.getData('passport') as PassportStatic,
+    mailer: framework.settings.getData('mailer') as Mailer
   } as BootstrapSettings;
 };
