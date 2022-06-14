@@ -5,8 +5,7 @@ import {
   Body,
   Param,
   Delete,
-  Put,
-  Req
+  Put
 } from 'routing-controllers';
 
 import { Sequelize, SequelizeInterface } from '@packages/advanced-sequelize';
@@ -41,48 +40,6 @@ export class UserController {
 
       await transaction.commit();
       return userRows.map((row: User) => row.toJSON());
-    } catch (error) {
-      if (transaction) await transaction.rollback();
-      throw error;
-    }
-  }
-
-  @Can('pets.self-read')
-  @Get('/me/pets')
-  public async mePets(@Req() req: any) {
-    let transaction;
-    try {
-      transaction = await this.sequelize.transaction();
-
-      const petsRows: Pet[] = await req.user.$get('pets', { transaction });
-
-      await transaction.commit();
-      return petsRows.map((row) => row.toJSON());
-    } catch (error) {
-      if (transaction) await transaction.rollback();
-      throw error;
-    }
-  }
-
-  @Can('users.read', ['user', 'super_admin'])
-  @Get('/me')
-  public me(@Req() req: any) {
-    return req.user?.toJSON();
-  }
-
-  @Can('users.read', ['user', 'super_admin'])
-  @Put('/me')
-  public async meUpdate(@Req() req: any, @Body() data: User) {
-    let transaction;
-
-    try {
-      transaction = await this.sequelize.transaction();
-
-      const user = req.user;
-      const updatedUser = await this.userService.update(user, data, { transaction });
-
-      await transaction.commit();
-      return updatedUser.toJSON();
     } catch (error) {
       if (transaction) await transaction.rollback();
       throw error;
