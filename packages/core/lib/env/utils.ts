@@ -8,7 +8,12 @@ export function getOsEnv(key: string): string {
   return process.env[key] as string;
 }
 
-export function getOsEnvOptional(key: string): string | undefined {
+export function getOsEnvOptional(key: string, defaultValue?: string): string | undefined {
+  if (!process.env[key]) {
+    if (!defaultValue) return undefined;
+    return defaultValue;
+  }
+
   return process.env[key];
 }
 
