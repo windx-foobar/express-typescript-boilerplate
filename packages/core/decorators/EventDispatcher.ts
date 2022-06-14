@@ -1,4 +1,4 @@
-import { EventDispatcher as EventDispatcherClass } from 'event-dispatch';
+import { EventDispatcher as EventDispatcherClass } from '@packages/event-dispatch';
 import { Container } from 'typedi';
 
 export function EventDispatcher(): any {
@@ -8,4 +8,4 @@ export function EventDispatcher(): any {
   };
 }
 
-export { EventDispatcher as EventDispatcherInterface } from 'event-dispatch';
+export { EventDispatcher as EventDispatcherInterface } from '@packages/event-dispatch';

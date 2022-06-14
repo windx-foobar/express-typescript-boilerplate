@@ -4,6 +4,7 @@ import { promisify } from 'util';
 
 export type Maybe<T> = T | undefined | null;
 export type AnyFunction = (...args: any[]) => any;
+export type WithFireEvent<T> = { fireEvent?: boolean } & T;
 
 export const glob = promisify(_glob);
 export const exec = promisify(_exec);
