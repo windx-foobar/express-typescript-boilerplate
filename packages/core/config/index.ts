@@ -47,7 +47,8 @@ export const config = {
       subscribers: getOsPaths('SUBSCRIBERS'),
       views: {
         mailer: getOsPath('MAIL_VIEWS')
-      }/*,
+      },
+      commands: getOsPaths('COMMANDS')/*,
        interceptors: getOsPaths('INTERCEPTORS'),
        resolvers: getOsPaths('RESOLVERS')*/
     }
