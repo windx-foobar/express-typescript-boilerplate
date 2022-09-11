@@ -1,0 +1,5 @@
+{
+  "name": "@express-typescript-wxplate/wxconsole",
+  "version": "0.0.2",
+  "description": "Реализация CLI интерфейса для приложения"
+}
