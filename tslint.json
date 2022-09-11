@@ -11,7 +11,7 @@
     ],
     "no-unnecessary-initializer": false,
     "no-var-requires": true,
-    "no-null-keyword": true,
+    "no-null-keyword": false,
     "no-consecutive-blank-lines": true,
     "quotemark": [
       true,
